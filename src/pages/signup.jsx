@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosPost } from "../utils/axiosCaller";
-import { toast } from "react-toastify";
+import ToastHandler from "../utils/ToastHandler";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -23,8 +23,8 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    const loadingToast = toast.loading("Signing up... Please wait.");
 
+    const loadingToast = ToastHandler.showLoading("Signing up... Please wait.");
     try {
       const body = {
         name: formInputs.username,
@@ -34,24 +34,15 @@ const Signup = () => {
 
       const api = "api/auth/signup";
       await AxiosPost(api, body);
-
-      toast.update(loadingToast, {
-        render: "User signed up successfully!",
-        type: "success",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      navigate("/home");
+      ToastHandler.showSuccess("User signed up successfully!", loadingToast);
     } catch (error) {
       console.error("Error while signing up: ", error);
-      console.error("Error message: ", error?.response?.data?.message);
-      toast.update(loadingToast, {
-        render:
-          error?.response?.data?.message ||
+      ToastHandler.showError(
+        error?.response?.data?.message ||
           "Error while signing up. Please try again later.",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
+        loadingToast
+      );
     }
   };
 

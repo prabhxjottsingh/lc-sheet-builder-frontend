@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { AxiosPost } from "../utils/axiosCaller";
 import { toast } from "react-toastify";
+import ToastHandler from "../utils/ToastHandler";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,8 +24,8 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const loadingToast = toast.loading("Logging in... Please wait.");
 
+    const loadingToast = ToastHandler.showLoading("Logging in... Please wait.");
     try {
       const body = {
         email: formInputs.email,
@@ -33,24 +34,15 @@ const Login = () => {
 
       const api = "api/auth/login";
       await AxiosPost(api, body);
-
-      toast.update(loadingToast, {
-        render: "User logged in successfully!",
-        type: "success",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      navigate("/home");
+      ToastHandler.showSuccess("User logged in successfully!", loadingToast);
     } catch (error) {
       console.error("Error while logging up: ", error);
-      console.error("Error message: ", error?.response?.data?.message);
-      toast.update(loadingToast, {
-        render:
-          error?.response?.data?.message ||
-          "Error while logging up. Please try again later.",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      ToastHandler.showError(
+        error?.response?.data?.message ||
+          "Error while logging in. Please try again later.",
+        loadingToast
+      );
     }
   };
 

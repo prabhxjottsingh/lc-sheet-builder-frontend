@@ -2,6 +2,8 @@ import { faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AxiosPost } from "../utils/axiosCaller";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -19,10 +21,38 @@ const Signup = () => {
     setPasswordVisible((prevState) => !prevState);
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    console.log("These are the inputs: ", formInputs);
-    console.log("Signup Done");
+    const loadingToast = toast.loading("Signing up... Please wait.");
+
+    try {
+      const body = {
+        name: formInputs.username,
+        email: formInputs.email,
+        password: formInputs.password,
+      };
+
+      const api = "api/auth/signup";
+      await AxiosPost(api, body);
+
+      toast.update(loadingToast, {
+        render: "User signed up successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error("Error while signing up: ", error);
+      console.error("Error message: ", error?.response?.data?.message);
+      toast.update(loadingToast, {
+        render:
+          error?.response?.data?.message ||
+          "Error while signing up. Please try again later.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
   };
 
   return (
@@ -39,7 +69,7 @@ const Signup = () => {
               type="text"
               placeholder="Username"
               onChange={(event) =>
-                handleFormInputChange("username", event.target.value)
+                handleFormInputChange("username", event.target.value.trim())
               }
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               required
@@ -53,7 +83,7 @@ const Signup = () => {
               type="email"
               placeholder="Email"
               onChange={(event) =>
-                handleFormInputChange("email", event.target.value)
+                handleFormInputChange("email", event.target.value.trim())
               }
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               required
@@ -67,7 +97,7 @@ const Signup = () => {
               type={passwordVisible ? "text" : "password"}
               placeholder="Password"
               onChange={(event) =>
-                handleFormInputChange("password", event.target.value)
+                handleFormInputChange("password", event.target.value.trim())
               }
               className="w-full mt-1 px-4 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               required

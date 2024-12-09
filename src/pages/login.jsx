@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
+import { AxiosPost } from "../utils/axiosCaller";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,10 +21,37 @@ const Login = () => {
     setPasswordVisible((prevState) => !prevState);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("These are the inputs: ", formInputs);
-    console.log("Login submitted");
+    const loadingToast = toast.loading("Logging in... Please wait.");
+
+    try {
+      const body = {
+        email: formInputs.email,
+        password: formInputs.password,
+      };
+
+      const api = "api/auth/login";
+      await AxiosPost(api, body);
+
+      toast.update(loadingToast, {
+        render: "User logged in successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error("Error while logging up: ", error);
+      console.error("Error message: ", error?.response?.data?.message);
+      toast.update(loadingToast, {
+        render:
+          error?.response?.data?.message ||
+          "Error while logging up. Please try again later.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
   };
 
   return (

@@ -5,8 +5,11 @@ import { faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { AxiosPost } from "../utils/axiosCaller";
 import { toast } from "react-toastify";
 import ToastHandler from "../utils/ToastHandler";
+import { useCookies } from "react-cookie";
+import { constants } from "../utils/constants";
 
 const Login = () => {
+  const [cookies, setCookie] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const navigate = useNavigate();
   const [formInputs, setFormInputs] = useState({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -33,7 +36,8 @@ const Login = () => {
       };
 
       const api = "api/auth/login";
-      await AxiosPost(api, body);
+      const { data } = await AxiosPost(api, body);
+      setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.token);
       navigate("/home");
       ToastHandler.showSuccess("User logged in successfully!", loadingToast);
     } catch (error) {

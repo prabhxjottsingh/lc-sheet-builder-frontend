@@ -1,9 +1,20 @@
-import { Hash } from "lucide-react";
-import React from "react";
+import { Hash, Plus } from "lucide-react";
+import React, { useState } from "react";
+import AddNewSheetModal from "./Modals/AddNewSheetModal";
 
 const SheetSidebar = ({ sheetsMetadata, setSelectedSheet, selectedSheet }) => {
+  const [isAddSheetModalOpen, setIsAddSheetModalOpen] = useState(false);
+
+  const handleAddSheetClick = () => {
+    setIsAddSheetModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsAddSheetModalOpen(false);
+  };
+
   return (
-    <div className="w-16 bg-gray-950 flex flex-col items-center pt-4 space-y-2">
+    <div className="w-16 flex flex-col items-center pt-4 space-y-2">
       {sheetsMetadata.map((sheet) => (
         <div
           key={sheet._id}
@@ -21,14 +32,20 @@ const SheetSidebar = ({ sheetsMetadata, setSelectedSheet, selectedSheet }) => {
           <Hash className="w-6 h-6" />
         </div>
       ))}
+
+      {/* Add New Sheet Button */}
       <div
+        onClick={handleAddSheetClick}
         className={`
               w-12 h-12 rounded-2xl flex items-center justify-center 
-              cursor-pointer transition-all duration-200
+              cursor-pointer transition-all duration-200 bg-gray-700 hover:bg-gray-600 hover:rounded-xl
             `}
       >
-        <Hash className="w-6 h-6" />
+        <Plus className="w-6 h-6" />
       </div>
+
+      {/* Add New Sheet Modal */}
+      {isAddSheetModalOpen && <AddNewSheetModal onClose={closeModal} />}
     </div>
   );
 };

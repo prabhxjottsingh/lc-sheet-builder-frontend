@@ -1,47 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SheetSidebar from "../components/SheetSidebar";
 import SheetDetailbar from "../components/SheetDetailsbar";
 import SheetdataComponent from "../components/SheetdataComponent";
+import { AxiosGet } from "@/utils/axiosCaller";
+import { tempSheetsMetadata } from "@/lib/utils";
+import { useCookies } from "react-cookie";
+import ToastHandler from "@/utils/ToastHandler";
+import { constants } from "@/utils/constants";
+import { SheetData } from "./sheetData";
+import { AppContext } from "@/lib/Appcontext";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
+  const navigate = useNavigate();
+  const { refreshSheetSidebar, refreshSheetDetailBar } = useContext(AppContext);
+
   const [sheetsMetadata, setSheetsMetadata] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState(null);
 
-  useEffect(() => {
-    // Simulate an API call to fetch sheet metadata
-    const tempSheetsMetadata = [
-      {
-        _id: 123,
-        name: "Array Problems",
-        description: "Easy and medium array problems.",
-        categories: ["Easy", "Medium"],
-        totalProblems: 50,
-        solvedProblems: 20,
-        problems: [
-          { id: 1, title: "Two Sum", difficulty: "Easy" },
-          { id: 2, title: "Maximum Subarray", difficulty: "Medium" },
-        ],
-      },
-      {
-        _id: 234,
-        name: "Graph Problems",
-        description: "Problems related to graphs and trees.",
-        categories: ["Medium", "Hard"],
-        totalProblems: 40,
-        solvedProblems: 15,
-        problems: [
-          { id: 3, title: "Number of Islands", difficulty: "Medium" },
-          { id: 4, title: "Word Ladder", difficulty: "Hard" },
-        ],
-      },
-    ];
-    setSheetsMetadata(tempSheetsMetadata);
+  const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+  const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
 
-    // Auto-select first sheet
-    if (tempSheetsMetadata.length > 0) {
-      setSelectedSheet(tempSheetsMetadata[0]);
+  const [parentCompRefresh, setParentCompRefresh] = useState(false);
+
+  const fetchUsersSheetMetadata = async () => {
+    try {
+      const api = "api/sheets/getusersheetsmetadata";
+      const response = await AxiosGet(api, {}, token);
+      setSheetsMetadata([...response.data.data, ...tempSheetsMetadata]);
+      if (tempSheetsMetadata.length > 0 && !selectedSheet) {
+        setSelectedSheet(tempSheetsMetadata[0]);
+      } else {
+        const prevSheet = selectedSheet;
+        setSelectedSheet(null);
+        setSelectedSheet(prevSheet);
+      }
+    } catch (error) {
+      console.error("Error while fetching sheets metadata: ", error);
+      ToastHandler.showCustom(
+        "error",
+        error?.response?.data?.message ||
+          "Error while fetching sheets data. Please try again later."
+      );
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchUsersSheetMetadata();
+    setParentCompRefresh((prev) => !prev);
+  }, [refreshSheetSidebar]);
+
+  useEffect(() => {
+    const isTokenMissing = !cookies[constants.COOKIES_KEY.AUTH_TOKEN];
+    if (isTokenMissing) {
+      navigate("/login");
+    }
+  }, [cookies, navigate]);
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -52,11 +66,12 @@ export const Home = () => {
         setSelectedSheet={setSelectedSheet}
       />
 
-      {/* Sheet Details Sidebar */}
-      {selectedSheet && <SheetDetailbar selectedSheet={selectedSheet} />}
-
-      {/* Main Content Area */}
-      {selectedSheet && <SheetdataComponent selectedSheet={selectedSheet} />}
+      {selectedSheet && (
+        <SheetData
+          selectedSheet={selectedSheet}
+          parentCompRefresh={parentCompRefresh}
+        />
+      )}
     </div>
   );
 };

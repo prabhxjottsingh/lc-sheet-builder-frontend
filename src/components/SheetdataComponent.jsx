@@ -3,6 +3,11 @@ import ProblemCategoryBlock from "./ProblemCategoryBlock";
 
 const SheetdataComponent = ({ selectedSheet }) => {
   const [activeTab, setActiveTab] = useState("problems");
+
+  // Fallback values
+  const problems = selectedSheet?.data?.problems || [];
+  const sheetName = selectedSheet?.data?.name || "Sheet Name Not Defined";
+
   return (
     <>
       <div className="flex-1 bg-gray-900 p-6 overflow-y-auto">
@@ -35,21 +40,31 @@ const SheetdataComponent = ({ selectedSheet }) => {
 
         {activeTab === "problems" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {selectedSheet?.problems.map((problem) => (
-              <div
-                key={problem.id}
-                className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">{problem.title}</h3>
-                  <ProblemCategoryBlock category={problem.difficulty} />
+            {problems.length > 0 ? (
+              problems.map((problem) => (
+                <div
+                  key={problem.id}
+                  className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-semibold">
+                      {problem.title || "Problem Title Not Available"}
+                    </h3>
+                    <ProblemCategoryBlock
+                      category={problem.difficulty || "Unknown"}
+                    />
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-400">
+                    <span>Acceptance</span>
+                    <span>{problem.acceptance || "N/A"}%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm text-gray-400">
-                  <span>Acceptance</span>
-                  <span>65.4%</span>
-                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-400 py-8">
+                No problems available for this sheet.
               </div>
-            ))}
+            )}
           </div>
         )}
 

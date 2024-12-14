@@ -4,8 +4,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosPost } from "../utils/axiosCaller";
 import ToastHandler from "../utils/ToastHandler";
+import { constants } from "../utils/constants";
+import { useCookies } from "react-cookie";
 
 const Signup = () => {
+  const [cookies, setCookie] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const navigate = useNavigate();
   const [formInputs, setFormInputs] = useState({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -33,7 +36,9 @@ const Signup = () => {
       };
 
       const api = "api/auth/signup";
-      await AxiosPost(api, body);
+      const { data } = await AxiosPost(api, body);
+      setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.token);
+
       navigate("/home");
       ToastHandler.showSuccess("User signed up successfully!", loadingToast);
     } catch (error) {

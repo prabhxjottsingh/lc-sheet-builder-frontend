@@ -10,7 +10,7 @@ class ToastHandler {
       render: message || "Operation completed successfully!",
       type: "success",
       isLoading: false,
-      autoClose: 3000,
+      autoClose: 1000,
     });
   }
 
@@ -19,14 +19,14 @@ class ToastHandler {
       render: message || "An error occurred. Please try again later.",
       type: "error",
       isLoading: false,
-      autoClose: 3000,
+      autoClose: 1000,
     });
   }
 
   static showCustom({
     type = "info",
     message,
-    autoClose = 3000,
+    autoClose = 1000,
     options = {},
   }) {
     toast(message, {

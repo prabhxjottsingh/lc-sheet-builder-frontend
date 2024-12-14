@@ -1,7 +1,6 @@
 import React from "react";
 import Modal from "react-modal";
 
-// Set the root element for the modal
 Modal.setAppElement("#root");
 
 const ConfirmationModal = ({

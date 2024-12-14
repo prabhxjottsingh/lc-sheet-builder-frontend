@@ -1,7 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-// Forward ref and properly handle default type
 const Input = React.forwardRef(
   ({ className, type = "text", ...props }, ref) => {
     return (
@@ -12,7 +11,7 @@ const Input = React.forwardRef(
           className
         )}
         ref={ref}
-        {...props} // Pass remaining props like onChange, value, etc.
+        {...props}
       />
     );
   }

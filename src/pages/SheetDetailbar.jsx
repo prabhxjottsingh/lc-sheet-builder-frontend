@@ -66,7 +66,6 @@ export const SheetDetailbar = ({ selectedSheet }) => {
       const api = "api/category/getcategoriesbysheetid";
       const response = await AxiosGet(api, queryParams, token);
 
-      // Extract data from each response and push to categoryIdsMetadata
       const categoryIdsMetadata = response.data.data.map(
         (categoryMetadata) => ({
           ...categoryMetadata.metadata,
@@ -79,7 +78,6 @@ export const SheetDetailbar = ({ selectedSheet }) => {
         loadingToast
       );
 
-      // Auto-select first sheet
       setSheetDetails((prev) => ({
         sheetName: selectedSheet?.metadata?.name || "Sheet Name is Not Defined",
         sheetDescription:

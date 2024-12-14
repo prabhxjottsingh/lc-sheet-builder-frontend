@@ -6,7 +6,6 @@ import React, { useContext, useState } from "react";
 import { useCookies } from "react-cookie";
 import Modal from "react-modal";
 
-// Set the root element for the modal
 Modal.setAppElement("#root");
 
 const AddNewSheetModal = ({ onClose }) => {

@@ -17,7 +17,6 @@ import { LucideTrash } from "lucide-react";
 const SheetdataComponent = ({ categories, sheetId }) => {
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
-  // State for active tab and modal
   const { refreshSheetdataComponent, setRefreshSheetDetailBar } =
     useContext(AppContext);
   const [activeTab, setActiveTab] = useState(0);
@@ -34,7 +33,6 @@ const SheetdataComponent = ({ categories, sheetId }) => {
   const handleConfirmDelete = async () => {
     const loadingToast = ToastHandler.showLoading("Deleting... Please wait.");
     try {
-      console.log("This is selectedProb: ", selectedProblem);
       const queryParams =
         deletingResource === "category"
           ? { categoryId: categories[activeTab]._id, sheetId }
@@ -42,7 +40,6 @@ const SheetdataComponent = ({ categories, sheetId }) => {
               categoryId: categories[activeTab]._id,
               problemId: selectedProblem._id,
             };
-      console.log("This is queryparams: ", queryParams);
       const api =
         deletingResource === "category"
           ? "api/category/deletecategory"
@@ -73,17 +70,14 @@ const SheetdataComponent = ({ categories, sheetId }) => {
       const api = "api/problem/getproblemsbycategoryid";
       const response = await AxiosGet(api, queryParams, token);
 
-      // Extract data from each response and push to categoryIdsMetadata
       const addedProblemsData = response.data.data;
-      //   const filteredProblemsData =
-      console.log("Addded problems data: ", addedProblemsData);
       setProblems(
         addedProblemsData.map((addedProblem) => {
           const matchingProblem = problemsData.stat_status_pairs.find(
             (problemData) =>
               addedProblem.lcproblemId == problemData.stat.question_id
           );
-          return { ...matchingProblem, _id: addedProblem._id }; // Return the matching object or undefined if not found
+          return { ...matchingProblem, _id: addedProblem._id };
         })
       );
 
@@ -100,7 +94,6 @@ const SheetdataComponent = ({ categories, sheetId }) => {
 
   useEffect(() => {
     if (categories && categories.length > 0) {
-      // Set the initial active tab to the first category's name when categories are loaded
       setActiveTab(0);
     }
   }, [categories]);
@@ -109,9 +102,6 @@ const SheetdataComponent = ({ categories, sheetId }) => {
     fetchProblemsData();
   }, [activeTab, refreshSheetdataComponent]);
 
-  useEffect(() => {
-    console.log("These are the setPRoblems: ", problems);
-  }, [problems]);
   return (
     <div className="flex-1 bg-gray-900 p-6 overflow-y-auto">
       {/* Categories Tabs */}

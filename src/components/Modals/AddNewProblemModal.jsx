@@ -7,14 +7,12 @@ import ToastHandler from "@/utils/ToastHandler";
 import { useCookies } from "react-cookie";
 import { problemsData } from "@/problemsConfig";
 
-// Set the root element for the modal
 Modal.setAppElement("#root");
 
-// Difficulty level mapping
 const DIFFICULTY_COLORS = {
-  1: "text-green-500", // Easy
-  2: "text-yellow-500", // Medium
-  3: "text-red-500", // Hard
+  1: "text-green-500",
+  2: "text-yellow-500", 
+  3: "text-red-500",
 };
 
 const DIFFICULTY_LABELS = {
@@ -63,7 +61,6 @@ const AddNewProblemModal = ({ onClose, categoryId }) => {
     );
 
     try {
-      console.log("This is categoryId: ", categoryId);
       const body = {
         categoryId,
         problemIds: selectedProblems.map((problem) => ({
@@ -133,7 +130,7 @@ const AddNewProblemModal = ({ onClose, categoryId }) => {
         <div
           className="flex-grow overflow-y-auto mb-6 space-y-2 
   scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-track-gray-800 
-  max-h-[50vh] pr-2" // Added max-height and right padding
+  max-h-[50vh] pr-2"
         >
           {filteredProblems.length > 0 ? (
             filteredProblems.map((problem) => (

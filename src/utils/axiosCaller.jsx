@@ -5,7 +5,6 @@ import { constants } from "./constants";
 
 const BASE_URL = config.BACKEND_URL;
 
-// navigation logic is handled in HOME page
 const redirectToLoginPage = () => {
   removeCookieKey(constants.COOKIES_KEY.AUTH_TOKEN);
 };
@@ -18,11 +17,10 @@ export const AxiosPost = async (api, body, token) => {
     const response = await axios.post(`${BASE_URL + api}`, body, { headers });
     return response;
   } catch (error) {
-    // Handle expired token
     if (error.response && error.response.status === 401) {
       redirectToLoginPage();
     }
-    throw error; // Re-throw error for other cases
+    throw error;
   }
 };
 
@@ -37,11 +35,10 @@ export const AxiosGet = async (api, queryParams, token) => {
     });
     return response;
   } catch (error) {
-    // Handle expired token
     if (error.response && error.response.status === 401) {
       redirectToLoginPage();
     }
-    throw error; // Re-throw error for other cases
+    throw error;
   }
 };
 
@@ -53,7 +50,6 @@ export const AxiosDelete = async (api, queryParams, token) => {
     const queryStringParams = queryParams
       ? jsonToQueryParamStringConvertor(queryParams)
       : "";
-    console.log("Query: ", queryParams);
     const response = await axios.delete(
       `${BASE_URL + api + queryStringParams}`,
       { headers }

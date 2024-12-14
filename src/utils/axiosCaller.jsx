@@ -35,16 +35,35 @@ export const AxiosGet = async (api, queryParams, token) => {
     const response = await axios.get(`${BASE_URL + api + queryStringParams}`, {
       headers,
     });
-    console.log("These are the queryParams: ", queryStringParams);
-    console.log("These are the orgParams: ", queryParams);
     return response;
   } catch (error) {
     // Handle expired token
-    console.log("This is the error.response: ", error.response);
-    console.log("Error.response.status");
     if (error.response && error.response.status === 401) {
       redirectToLoginPage();
     }
     throw error; // Re-throw error for other cases
+  }
+};
+
+export const AxiosDelete = async (api, queryParams, token) => {
+  try {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const queryStringParams = queryParams
+      ? jsonToQueryParamStringConvertor(queryParams)
+      : "";
+    console.log("Query: ", queryParams);
+    const response = await axios.delete(
+      `${BASE_URL + api + queryStringParams}`,
+      { headers }
+    );
+
+    return response;
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      redirectToLoginPage();
+    }
+    throw error;
   }
 };

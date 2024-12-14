@@ -1,13 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import SheetSidebar from "../components/SheetSidebar";
-import SheetDetailbar from "../components/SheetDetailsbar";
-import SheetdataComponent from "../components/SheetdataComponent";
+import SheetSidebar from "../components/sheetsidebar";
 import { AxiosGet } from "@/utils/axiosCaller";
 import { tempSheetsMetadata } from "@/lib/utils";
 import { useCookies } from "react-cookie";
 import ToastHandler from "@/utils/ToastHandler";
 import { constants } from "@/utils/constants";
-import { SheetData } from "./sheetData";
+import { SheetDetailbar } from "./SheetDetailbar";
 import { AppContext } from "@/lib/Appcontext";
 import { useNavigate } from "react-router-dom";
 
@@ -16,20 +14,18 @@ export const Home = () => {
   const { refreshSheetSidebar, refreshSheetDetailBar } = useContext(AppContext);
 
   const [sheetsMetadata, setSheetsMetadata] = useState([]);
-  const [selectedSheet, setSelectedSheet] = useState(null);
+const [selectedSheet, setSelectedSheet] = useState(null);
 
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
 
-  const [parentCompRefresh, setParentCompRefresh] = useState(false);
-
   const fetchUsersSheetMetadata = async () => {
     try {
-      const api = "api/sheets/getusersheetsmetadata";
+      const api = "api/sheet/getusersheetsmetadata";
       const response = await AxiosGet(api, {}, token);
-      setSheetsMetadata([...response.data.data, ...tempSheetsMetadata]);
-      if (tempSheetsMetadata.length > 0 && !selectedSheet) {
-        setSelectedSheet(tempSheetsMetadata[0]);
+      setSheetsMetadata(response.data.data);
+      if (!selectedSheet) {
+        setSelectedSheet(response.data.data[0]);
       } else {
         const prevSheet = selectedSheet;
         setSelectedSheet(null);
@@ -47,8 +43,7 @@ export const Home = () => {
 
   useEffect(() => {
     fetchUsersSheetMetadata();
-    setParentCompRefresh((prev) => !prev);
-  }, [refreshSheetSidebar]);
+  }, [refreshSheetSidebar, refreshSheetDetailBar]);
 
   useEffect(() => {
     const isTokenMissing = !cookies[constants.COOKIES_KEY.AUTH_TOKEN];
@@ -66,12 +61,7 @@ export const Home = () => {
         setSelectedSheet={setSelectedSheet}
       />
 
-      {selectedSheet && (
-        <SheetData
-          selectedSheet={selectedSheet}
-          parentCompRefresh={parentCompRefresh}
-        />
-      )}
+      {selectedSheet && <SheetDetailbar selectedSheet={selectedSheet} />}
     </div>
   );
 };

@@ -11,3 +11,17 @@ export const badgeColors = {
   White: "bg-pink-500", // Added new colors
   Purple: "bg-purple-600", // Added new colors
 };
+
+export const difficultyColors = {
+  0: "bg-green-600 text-white", // Easy
+  1: "bg-green-300 text-black", // Medium
+  2: "bg-yellow-600 text-white", // Hard
+  3: "bg-red-600 text-white", // Very Hard
+};
+
+export const difficultyLabels = {
+  0: "Easy",
+  1: "Medium",
+  2: "Hard",
+  3: "Insane",
+};

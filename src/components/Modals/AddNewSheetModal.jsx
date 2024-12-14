@@ -37,7 +37,7 @@ const AddNewSheetModal = ({ onClose }) => {
         description: formInputs.description,
       };
 
-      const api = "api/sheets/addnewsheet";
+      const api = "api/sheet/addnewsheet";
       await AxiosPost(api, body, token);
       setRefreshSheetSidebar((prev) => !prev);
       onClose();

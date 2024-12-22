@@ -1,7 +1,7 @@
 import axios from "axios";
-import config from "../config";
-import { jsonToQueryParamStringConvertor, removeCookieKey } from "@/lib/utils";
+import config from "../config.jsx";
 import { constants } from "./constants";
+import { jsonToQueryParamStringConvertor, removeCookieKey } from "@/lib/utils";
 
 const BASE_URL = config.BACKEND_URL;
 

@@ -11,7 +11,7 @@ Modal.setAppElement("#root");
 
 const DIFFICULTY_COLORS = {
   1: "text-green-500",
-  2: "text-yellow-500", 
+  2: "text-yellow-500",
   3: "text-red-500",
 };
 
@@ -21,7 +21,7 @@ const DIFFICULTY_LABELS = {
   3: "Hard",
 };
 
-const AddNewProblemModal = ({ onClose, categoryId }) => {
+const AddNewProblemModal = ({ isOpen, onClose, categoryId }) => {
   const { setRefreshSheetdataComponent } = useContext(AppContext);
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
@@ -89,7 +89,7 @@ const AddNewProblemModal = ({ onClose, categoryId }) => {
 
   return (
     <Modal
-      isOpen={true}
+      isOpen={isOpen}
       onRequestClose={onClose}
       contentLabel="Add Problems Modal"
       className="bg-gray-800 text-gray-300 p-8 rounded-xl shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col"

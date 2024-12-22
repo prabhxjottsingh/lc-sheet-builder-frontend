@@ -4,11 +4,19 @@ import { constants } from "@/utils/constants";
 import ToastHandler from "@/utils/ToastHandler";
 import React, { useContext, useState } from "react";
 import { useCookies } from "react-cookie";
-import Modal from "react-modal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
-Modal.setAppElement("#root");
-
-const AddNewSheetModal = ({ onClose }) => {
+const AddNewSheetModal = ({ isOpen, onClose }) => {
   const { setRefreshSheetSidebar } = useContext(AppContext);
 
   const [formInputs, setFormInputs] = useState({});
@@ -53,69 +61,51 @@ const AddNewSheetModal = ({ onClose }) => {
   };
 
   return (
-    <Modal
-      isOpen={true}
-      onRequestClose={onClose}
-      contentLabel="Add New Sheet Modal"
-      className="bg-gray-800 text-gray-300 p-8 rounded-xl shadow-lg w-1/2 transform transition-all duration-300"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
-    >
-      <div>
-        <h2 className="text-2xl font-semibold text-white mb-6">
-          Add New Sheet
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            <div className="flex flex-col">
-              <label htmlFor="sheetname" className="text-sm font-medium mb-2">
-                Sheet Name
-              </label>
-              <input
-                id="sheetname"
-                type="text"
-                placeholder="Enter sheet name"
-                value={formInputs?.name}
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Sheet</DialogTitle>
+            <DialogDescription>
+              Add a new Sheet with following configuration
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                placeholder="Leetcode 75"
+                className="col-span-3"
                 onChange={(event) =>
                   handleFormInputChange("name", event.target.value)
                 }
-                className="bg-gray-700 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
               />
             </div>
-            <div className="flex flex-col">
-              <label htmlFor="description" className="text-sm font-medium mb-2">
-                Sheet Description
-              </label>
-              <input
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
+                Description
+              </Label>
+              <Input
                 id="description"
-                type="text"
-                placeholder="Enter sheet description"
-                value={formInputs?.description}
+                placeholder="These are the most asked leetcode 75 pattern problems"
+                className="col-span-3"
                 onChange={(event) =>
                   handleFormInputChange("description", event.target.value)
                 }
-                className="bg-gray-700 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-600 text-gray-200 py-2 px-4 rounded-md hover:bg-gray-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-500"
-            >
-              Add Sheet
-            </button>
-          </div>
-        </form>
-      </div>
-    </Modal>
+          <DialogFooter>
+            <Button type="submit" onClick={handleSubmit}>
+              Create Sheet
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

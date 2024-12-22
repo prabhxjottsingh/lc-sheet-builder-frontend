@@ -25,3 +25,9 @@ export const difficultyLabels = {
   2: "Hard",
   3: "Insane",
 };
+
+export const API_ENDPOINTS = {
+    SHEET: {
+        GET_SHEET_METADATA: ""
+    }
+}

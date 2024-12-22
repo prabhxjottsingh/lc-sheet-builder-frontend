@@ -9,22 +9,26 @@ import Login from "./pages/login";
 import Signup from "./pages/signup";
 import { Home } from "./pages/home";
 import { AppProvider } from "./lib/Appcontext";
+import { SidebarProvider } from "./components/ui/sidebar";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { Tooltip } from "./components/ui/tooltip";
 
 const AppRouter = () => (
   <Router>
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route
         path="/home"
         element={
           <AppProvider>
-            <Home />
+            <TooltipProvider>
+              <Home />
+            </TooltipProvider>
           </AppProvider>
         }
       />
-      {/* <Route path="/" element={<Dashboard />} />
-      <Route path="/sheet/:sheetId" element={<SheetView />} /> */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   </Router>

@@ -1,6 +1,11 @@
 import {
   BookOpen,
+  ChartColumn,
+  ChevronDown,
+  Dot,
   LucideTrash,
+  MoreHorizontal,
+  MoreVertical,
   Pencil,
   Plus,
   Star,
@@ -16,6 +21,23 @@ import { AppContext } from "@/lib/Appcontext";
 import SheetdataComponent from "@/components/SheetdataComponent";
 import AddNewCategoryModal from "@/components/Modals/AddNewCategoryModal";
 import ConfirmationModal from "@/components/Modals/ConfrimationModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 export const SheetDetailbar = ({ selectedSheet }) => {
   const { refreshSheetDetailBar, setRefreshSheetDetailBar } =
@@ -111,28 +133,56 @@ export const SheetDetailbar = ({ selectedSheet }) => {
   return (
     <>
       {" "}
-      {/* Sheet Details Sidebar */}
-      <div className="w-64 bg-gray-800 p-4 border-r border-gray-700">
-        <div>
+      <div className="w-64 p-4">
+        <div className="p-4">
+          <h4 className="mb-4 text-sm font-medium leading-none">
+            Sheet Information
+          </h4>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">{sheetDetails.sheetName}</h2>
-            <button
-              onClick={() => setIsConfirmationModalOpen(true)}
-              className="flex items-center gap-2 text-red-600 px-4 py-2 rounded-lg hover:text-red-400"
-            >
-              <LucideTrash className="w-5 h-5" />
-              {/* Delete Sheet */}
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant="outline"
+                      className="duration-200 border-none "
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </Button>
+                    <TooltipContent>{"Sheet Actions"}</TooltipContent>
+                  </TooltipTrigger>
+                </Tooltip>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 rounded-lg shadow-md ring-1  focus:outline-none transition-all duration-200 border-black">
+                <DropdownMenuLabel className=" font-semibold text-slate-100 p-2">
+                  Sheet Edit Options
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex items-center justify-between p-2 rounded-lg text-red-500 hover:text-red-600 transition-colors duration-200"
+                  onClick={() => setIsConfirmationModalOpen(true)}
+                >
+                  Delete
+                  <DropdownMenuShortcut>
+                    <LucideTrash className="w-5 h-5 ml-2" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="space-y-4">
-            <div className="bg-gray-700 p-3 rounded">
-              <h3 className="font-semibold mb-2 flex items-center">
-                <BookOpen className="w-4 h-4 mr-2" /> Overview
+            <div className="p-4 rounded-md border bg-background shadow-lg text-white">
+              <h3 className="font-semibold mb-3 flex items-center">
+                <BookOpen className="w-5 h-5 mr-3 text-blue-500" />
+                <span>Overview</span>
               </h3>
+              <Separator className="my-2 border " />
               <p className="text-sm text-gray-300">
-                {sheetDetails.sheetDescription}
+                {sheetDetails.sheetDescription || "No description available."}
               </p>
             </div>
+
             {/* <div className="bg-gray-700 p-3 rounded">
                 <h3 className="font-semibold mb-2 flex items-center">
                   <Star className="w-4 h-4 mr-2" /> Progress
@@ -152,34 +202,29 @@ export const SheetDetailbar = ({ selectedSheet }) => {
                   ></div>
                 </div>
               </div> */}
-            <div className="bg-gray-700 p-3 rounded">
-              <div className="flex justify-between items-center mb-2">
+            <div className="p-4 rounded-md border bg-background shadow-lg text-white">
+              <div className="font-semibold mb-3 flex items-center">
+                <ChartColumn className="w-5 h-5 mr-3 text-blue-500" />
                 <h3 className="font-semibold">Categories</h3>
                 <button
                   onClick={handleAddCategoryClick}
-                  className="bg-gray-600 text-white p-2 rounded-full hover:bg-gray-500"
+                  className="flex items-center justify-center w-8 h-8 ml-3 bg-black text-white rounded-full hover:bg-gray-800 focus:ring-2 focus:ring-gray-500"
                   aria-label="Add Category"
                 >
-                  {/* Pencil Icon from Lucide */}
                   <Plus size={16} />
                 </button>
               </div>
-              {isAddCategoryModalOpen && (
-                <AddNewCategoryModal
-                  sheetId={selectedSheet._id}
-                  onClose={closeModal}
-                />
-              )}
-              <div className="flex flex-wrap gap-2">
+
+              <Separator className="my-2 border " />
+              <div className="flex flex-wrap gap-2 mb-4">
                 {sheetDetails?.categories &&
-                sheetDetails?.categories?.length > 0 ? (
+                sheetDetails.categories.length > 0 ? (
                   sheetDetails.categories.map((category, index) => (
-                    <span
-                      key={index}
-                      className={`px-2 py-1 bg-gray-600 rounded text-xs ${category.color}`}
+                    <Badge
+                      className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition duration-200 ease-in-out ${category.color} text-white`}
                     >
                       {category.name}
-                    </span>
+                    </Badge>
                   ))
                 ) : (
                   <span className="text-gray-400 text-xs">
@@ -191,13 +236,14 @@ export const SheetDetailbar = ({ selectedSheet }) => {
           </div>
         </div>
       </div>
+      {/* Add New Category Modal */}
+      <AddNewCategoryModal
+        isOpen={isAddCategoryModalOpen}
+        sheetId={selectedSheet._id}
+        onClose={closeModal}
+      />
       {/* Main Content Area */}
-      {
-        <SheetdataComponent
-          categories={categories}
-          sheetId={selectedSheet._id}
-        />
-      }
+      <SheetdataComponent categories={categories} sheetId={selectedSheet._id} />
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={isConfirmationModalOpen}

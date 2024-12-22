@@ -1,6 +1,10 @@
-import { Hash, Plus } from "lucide-react";
+import { Hash, Notebook, Plus } from "lucide-react";
 import React, { useState } from "react";
 import AddNewSheetModal from "./Modals/AddNewSheetModal";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
 
 const SheetSidebar = ({ sheetsMetadata, setSelectedSheet, selectedSheet }) => {
   const [isAddSheetModalOpen, setIsAddSheetModalOpen] = useState(false);
@@ -14,38 +18,64 @@ const SheetSidebar = ({ sheetsMetadata, setSelectedSheet, selectedSheet }) => {
   };
 
   return (
-    <div className="w-16 flex flex-col items-center pt-4 space-y-2">
-      {sheetsMetadata.map((sheet) => (
-        <div
-          key={sheet._id}
-          onClick={() => setSelectedSheet(sheet)}
-          className={`
-              w-12 h-12 rounded-2xl flex items-center justify-center 
-              cursor-pointer transition-all duration-200
-              ${
-                selectedSheet?._id === sheet._id
-                  ? "bg-indigo-600 rounded-xl"
-                  : "bg-gray-700 hover:bg-gray-600 hover:rounded-xl"
-              }
-            `}
-        >
-          <Hash className="w-6 h-6" />
-        </div>
-      ))}
+    <div
+      className="w-20 h-screen flex flex-col items-center p-4 space-y-4 border-r border-gray-700 overflow-y-auto scrollbar-hide"
+      style={{
+        scrollbarWidth: "thin",
+        scrollbarColor: "#4b5563 #1f2937",
+        overflowX: "hidden",
+      }}
+    >
+      <div className="p-4">
+        <h4 className="mb-4 text-sm font-medium leading-none">Sheets</h4>
+        {/* Avatars */}
+        {sheetsMetadata.map((sheet) => (
+          <Tooltip key={sheet._id}>
+            <TooltipTrigger>
+              <Avatar
+                onClick={() => setSelectedSheet(sheet)}
+                className={`cursor-pointer transition-all duration-200 p-1 rounded-full
+            ${
+              selectedSheet?._id === sheet._id
+                ? "border-2 border-s-white"
+                : "bg-gray-800 hover:bg-gray-700 hover:border-gray-600"
+            }
+          `}
+              >
+                <AvatarImage src="https://github.com/shvadcn.png" />
+                <AvatarFallback>
+                  <Notebook className="w-6 h-6 text-white" />
+                </AvatarFallback>
+              </Avatar>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{sheet.metadata.name}</p>
+            </TooltipContent>
+            <Separator className="my-2" />
+          </Tooltip>
+        ))}
 
-      {/* Add New Sheet Button */}
-      <div
-        onClick={handleAddSheetClick}
-        className={`
-              w-12 h-12 rounded-2xl flex items-center justify-center 
-              cursor-pointer transition-all duration-200 bg-gray-700 hover:bg-gray-600 hover:rounded-xl
-            `}
-      >
-        <Plus className="w-6 h-6" />
+        {/* Add New Sheet Button */}
+        <Tooltip>
+          <TooltipTrigger>
+            <Avatar
+              onClick={handleAddSheetClick}
+              className={`cursor-pointer transition-all duration-200 p-1 rounded-full bg-gray-800 hover:bg-gray-700 hover:border-gray-600`}
+            >
+              <AvatarImage src="https://github.com/shvadcn.png" />
+              <AvatarFallback>
+                <Plus className="w-6 h-6 text-gray-500" />
+              </AvatarFallback>
+            </Avatar>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{"Add New Sheet"}</p>
+          </TooltipContent>
+          <Separator className="my-2" />
+        </Tooltip>
+
+        <AddNewSheetModal isOpen={isAddSheetModalOpen} onClose={closeModal} />
       </div>
-
-      {/* Add New Sheet Modal */}
-      {isAddSheetModalOpen && <AddNewSheetModal onClose={closeModal} />}
     </div>
   );
 };

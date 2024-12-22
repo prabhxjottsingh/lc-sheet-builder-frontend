@@ -4,11 +4,20 @@ import { badgeColors, constants } from "@/utils/constants";
 import ToastHandler from "@/utils/ToastHandler";
 import React, { useContext, useState } from "react";
 import { useCookies } from "react-cookie";
-import Modal from "react-modal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
-Modal.setAppElement("#root");
-
-const AddNewCategoryModal = ({ sheetId, onClose }) => {
+const AddNewCategoryModal = ({ isOpen, sheetId, onClose }) => {
   const { setRefreshSheetDetailBar } = useContext(AppContext);
   const [formInputs, setFormInputs] = useState({});
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
@@ -57,48 +66,33 @@ const AddNewCategoryModal = ({ sheetId, onClose }) => {
   };
 
   return (
-    <Modal
-      isOpen={true}
-      onRequestClose={onClose}
-      contentLabel="Add New Sheet Modal"
-      className="bg-gray-800 text-gray-300 p-8 rounded-xl shadow-lg w-1/2 transform transition-all duration-300"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
-    >
-      <div>
-        <h2 className="text-2xl font-semibold text-white mb-6">
-          Add New Category
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            {/* Category Name Input */}
-            <div className="flex flex-col">
-              <label
-                htmlFor="categoryName"
-                className="text-sm font-medium mb-2"
-              >
-                Category Name
-              </label>
-              <input
-                id="categoryName"
-                type="text"
-                placeholder="Enter category name"
-                value={formInputs?.name}
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Category</DialogTitle>
+            <DialogDescription>
+              Add a new Category with following configuration
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                placeholder="Hard"
+                className="col-span-3"
                 onChange={(event) =>
                   handleFormInputChange("name", event.target.value)
                 }
-                className="bg-gray-700 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
               />
             </div>
-
-            {/* Category Color Picker */}
-            <div className="flex flex-col">
-              <label
-                htmlFor="categoryColor"
-                className="text-sm font-medium mb-2"
-              >
-                Category Color
-              </label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="color" className="text-right">
+                Color
+              </Label>
               <div className="flex gap-4">
                 {Object.keys(badgeColors).map((key) => (
                   <div
@@ -106,38 +100,33 @@ const AddNewCategoryModal = ({ sheetId, onClose }) => {
                     onClick={() =>
                       handleFormInputChange("color", badgeColors[key])
                     }
-                    className={`w-8 h-8 rounded-full cursor-pointer flex items-center justify-center ${
+                    className={`w-10 h-10 rounded-full cursor-pointer flex items-center justify-center transition duration-300 ease-in-out transform ${
                       badgeColors[key]
                     } ${
                       formInputs.color === badgeColors[key]
-                        ? "ring-4 ring-blue-500 ring-offset-2 ring-offset-gray-800 "
-                        : "ring-2 ring-gray-600 ring-offset-2 ring-offset-gray-800"
+                        ? "ring-4 ring-blue-200  ring-offset-2 ring-offset-gray-800 scale-110 shadow-lg"
+                        : "ring-2 ring-gray-600 ring-offset-2 ring-offset-gray-800 hover:scale-105 hover:shadow-md"
                     }`}
-                  ></div>
+                    title={key} // Display the color name on hover
+                  >
+                    <Avatar>
+                      <AvatarFallback
+                        className={`${badgeColors[key]}`}
+                      ></AvatarFallback>
+                    </Avatar>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-600 text-gray-200 py-2 px-4 rounded-md hover:bg-gray-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-500"
-            >
-              Add Category
-            </button>
-          </div>
-        </form>
-      </div>
-    </Modal>
+          <DialogFooter>
+            <Button type="submit" onClick={handleSubmit}>
+              Create Category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

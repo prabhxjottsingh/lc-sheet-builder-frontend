@@ -12,7 +12,19 @@ import {
 import { useCookies } from "react-cookie";
 import { AppContext } from "@/lib/Appcontext";
 import ConfirmationModal from "./Modals/ConfrimationModal";
-import { LucideTrash } from "lucide-react";
+import { LucideTrash, MoreVertical } from "lucide-react";
+import Loader from "./Loader";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const SheetdataComponent = ({ categories, sheetId }) => {
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
@@ -25,6 +37,8 @@ const SheetdataComponent = ({ categories, sheetId }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState({});
   const [deletingResource, setDeleteResource] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const closeModal = () => {
     setIsConfirmationModalOpen(false);
@@ -62,6 +76,7 @@ const SheetdataComponent = ({ categories, sheetId }) => {
   };
 
   const fetchProblemsData = async () => {
+    setIsLoading(true);
     const loadingToast = ToastHandler.showLoading(
       "Fetching problems data... Please wait."
     );
@@ -89,6 +104,8 @@ const SheetdataComponent = ({ categories, sheetId }) => {
           "Error while fetching problems data. Please try again later.",
         loadingToast
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -103,7 +120,7 @@ const SheetdataComponent = ({ categories, sheetId }) => {
   }, [activeTab, refreshSheetdataComponent]);
 
   return (
-    <div className="flex-1 bg-gray-900 p-6 overflow-y-auto">
+    <div className="flex-1  p-6 overflow-y-auto">
       {/* Categories Tabs */}
       <div
         className="flex overflow-x-auto flex-grow scrollbar-hide"
@@ -111,11 +128,11 @@ const SheetdataComponent = ({ categories, sheetId }) => {
       >
         {categories && categories.length > 0 ? (
           categories.map((category, categoryIdx) => (
-            <button
+            <div
               key={category._id}
               onClick={() => setActiveTab(categoryIdx)}
               className={`
-                px-4 py-2 whitespace-nowrap transition-all duration-300 ease-in-out transform hover:scale-105
+                px-4 py-2 whitespace-nowrap transition-all duration-300 ease-in-out transform hover:scale-105 hover:cursor-pointer
                 ${
                   activeTab === categoryIdx
                     ? "text-white border-b-2 border-indigo-500"
@@ -124,20 +141,44 @@ const SheetdataComponent = ({ categories, sheetId }) => {
               `}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">{category.name}</h2>
+                <h2 className="text-xl font-bold p-2">{category.name}</h2>
                 {categoryIdx !== 0 && (
-                  <button
-                    onClick={() => {
-                      setIsConfirmationModalOpen(true);
-                      setDeleteResource("category");
-                    }}
-                    className="flex items-center gap-2 text-red-600 px-4 py-2 rounded-lg hover:text-red-400"
-                  >
-                    <LucideTrash className="w-5 h-5" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Button
+                            variant="outline"
+                            className="duration-200 border-none"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                          <TooltipContent>{"Sheet Actions"}</TooltipContent>
+                        </TooltipTrigger>
+                      </Tooltip>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 rounded-lg shadow-md ring-1  focus:outline-none transition-all duration-200">
+                      <DropdownMenuLabel className=" font-semibold text-slate-100 p-2">
+                        Category Edit Options
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="flex items-center justify-between p-2 rounded-lg text-red-500 hover:text-red-600 transition-colors duration-200"
+                        onClick={() => {
+                          setIsConfirmationModalOpen(true);
+                          setDeleteResource("category");
+                        }}
+                      >
+                        Delete
+                        <DropdownMenuShortcut>
+                          <LucideTrash className="w-5 h-5 ml-2" />
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
               </div>
-            </button>
+            </div>
           ))
         ) : (
           <div className="text-center text-gray-400 py-8">
@@ -156,69 +197,101 @@ const SheetdataComponent = ({ categories, sheetId }) => {
         </button>
       </div>
 
-      {/* Problems List */}
-      {categories && categories.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {problems.length > 0 ? (
-            problems.map((problem) => (
-              <div
-                key={problem?.stat?.question_id}
-                className="bg-gray-900 shadow-md p-6 rounded-lg hover:bg-gray-800 transition-transform transform hover:scale-105"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-bold text-white text-lg">
-                    {problem?.stat?.question__title || "Untitled Problem"}
-                  </h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      difficultyColors[problem?.difficulty?.level]
-                    }`}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          {/* Problems List */}
+          {categories && categories.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {problems.length > 0 ? (
+                problems.map((problem) => (
+                  <div
+                    key={problem?.stat?.question_id}
+                    className="border  shadow-md p-6 rounded-lg hover:bg-gray-950 cursor-pointer duration-300"
                   >
-                    {difficultyLabels[problem?.difficulty?.level] || "Unknown"}
-                  </span>
-                  <button
-                    onClick={() => {
-                      setIsConfirmationModalOpen(true);
-                      setDeleteResource("problem");
-                      setSelectedProblem(problem);
-                    }}
-                    className="flex items-center gap-2 text-red-600 px-4 py-2 rounded-lg hover:text-red-400"
-                  >
-                    <LucideTrash className="w-5 h-5" />
-                  </button>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-bold text-white text-lg">
+                        {problem?.stat?.question__title || "Untitled Problem"}
+                      </h3>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          difficultyColors[problem?.difficulty?.level]
+                        }`}
+                      >
+                        {difficultyLabels[problem?.difficulty?.level] ||
+                          "Unknown"}
+                      </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                variant="outline"
+                                className="duration-200 border-none"
+                              >
+                                <MoreVertical className="" />
+                              </Button>
+                              <TooltipContent>{"Sheet Actions"}</TooltipContent>
+                            </TooltipTrigger>
+                          </Tooltip>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56 rounded-lg shadow-md ring-1  focus:outline-none transition-all duration-200">
+                          <DropdownMenuLabel className=" font-semibold text-slate-100 p-2">
+                            Problem Edit Options
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="flex items-center justify-between p-2 rounded-lg text-red-500 hover:text-red-600 transition-colors duration-200"
+                            onClick={() => {
+                              setIsConfirmationModalOpen(true);
+                              setDeleteResource("problem");
+                              setSelectedProblem(problem);
+                            }}
+                          >
+                            Delete
+                            <DropdownMenuShortcut>
+                              <LucideTrash className="w-5 h-5 ml-2" />
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-gray-400">
+                      <span>Acceptance Rate</span>
+                      <span className="font-medium">
+                        {problem?.stat?.total_submitted > 0
+                          ? `${(
+                              (problem?.stat?.total_acs /
+                                problem?.stat?.total_submitted) *
+                              100
+                            ).toFixed(1)}%`
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full flex justify-center items-center">
+                  <div className="text-center text-gray-400 py-8 px-6 mt-10">
+                    <p className="text-lg font-semibold">No Problems Found</p>
+                    <p className="text-sm">
+                      Try selecting a different category.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-sm text-gray-400">
-                  <span>Acceptance Rate</span>
-                  <span className="font-medium">
-                    {problem?.stat?.total_submitted > 0
-                      ? `${(
-                          (problem?.stat?.total_acs /
-                            problem?.stat?.total_submitted) *
-                          100
-                        ).toFixed(1)}%`
-                      : "N/A"}
-                  </span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full flex justify-center items-center">
-              <div className="text-center text-gray-400 py-8 px-6 mt-10">
-                <p className="text-lg font-semibold">No Problems Found</p>
-                <p className="text-sm">Try selecting a different category.</p>
-              </div>
+              )}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Add New Problem Modal */}
-      {isAddProblemModalOpen && (
-        <AddNewProblemModal
-          categoryId={categories[activeTab]?._id}
-          onClose={() => setIsAddProblemModalOpen(false)}
-        />
-      )}
+      <AddNewProblemModal
+        isOpen={isAddProblemModalOpen}
+        categoryId={categories[activeTab]?._id}
+        onClose={() => setIsAddProblemModalOpen(false)}
+      />
 
       {/* Confirmation Modal */}
       <ConfirmationModal

@@ -7,29 +7,34 @@ import {
 } from "react-router-dom";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
-import { Home } from "./pages/home";
+import { Home } from "./pages/Home";
 import { AppProvider } from "./lib/Appcontext";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { Tooltip } from "./components/ui/tooltip";
+import DefaultLayout from "./pages/DefaultLayout";
+// import SizeBar from "./components/ui/sizebar"; // Import the SizeBar component
+
+// DefaultLayout Component
+
 
 const AppRouter = () => (
   <Router>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Login />} />
+      <Route path="*" element={<Navigate to="/" />} />
       <Route path="/signup" element={<Signup />} />
       <Route
         path="/home"
         element={
           <AppProvider>
             <TooltipProvider>
-              <Home />
+                <Home />
             </TooltipProvider>
           </AppProvider>
         }
       />
-      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   </Router>
 );

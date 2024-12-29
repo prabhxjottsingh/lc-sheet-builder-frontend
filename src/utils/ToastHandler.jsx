@@ -1,13 +1,13 @@
+import { showToast, Toaster } from "@/components/ui/sonner";
 import { toast } from "react-toastify";
 
 class ToastHandler {
   static showLoading(message = "Loading...") {
-    return toast.loading(message);
+    return showToast(message);
   }
 
   static showSuccess(message, toastId) {
-    toast.update(toastId, {
-      render: message || "Operation completed successfully!",
+    showToast(message || "Operation completed successfully!", {
       type: "success",
       isLoading: false,
       autoClose: 1000,
@@ -15,8 +15,7 @@ class ToastHandler {
   }
 
   static showError(message, toastId) {
-    toast.update(toastId, {
-      render: message || "An error occurred. Please try again later.",
+    showToast(message || "An error occurred. Please try again later.", {
       type: "error",
       isLoading: false,
       autoClose: 1000,
@@ -29,7 +28,7 @@ class ToastHandler {
     autoClose = 1000,
     options = {},
   }) {
-    toast(message, {
+    showToast(message, {
       type,
       autoClose,
       ...options,

@@ -3,15 +3,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosPost } from "../utils/axiosCaller";
-import ToastHandler from "../utils/ToastHandler";
 import { constants } from "../utils/constants";
 import { useCookies } from "react-cookie";
+import { useToast } from "@/hooks/use-toast";
 
 const Signup = () => {
+  // toast message hook
+  const { toast } = useToast();
+
+  // to set the token (user's information) in the cookies
   const [cookies, setCookie] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+
+  // to navigate to the home page after successful login
   const navigate = useNavigate();
-  const [formInputs, setFormInputs] = useState({});
-  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const [formInputs, setFormInputs] = useState({}); // to store the form inputs
+  const [passwordVisible, setPasswordVisible] = useState(false); // to toggle the password visibility
 
   const handleFormInputChange = (key, value) => {
     setFormInputs((prevInputs) => ({
@@ -27,7 +34,10 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    const loadingToast = ToastHandler.showLoading("Signing up... Please wait.");
+    toast({
+      title: "Signing in... Please wait.",
+    });
+
     try {
       const body = {
         name: formInputs.username,
@@ -40,14 +50,17 @@ const Signup = () => {
       setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.token);
 
       navigate("/home");
-      ToastHandler.showSuccess("User signed up successfully!", loadingToast);
+      toast({
+        title: "User signed up successfully!",
+      });
     } catch (error) {
       console.error("Error while signing up: ", error);
-      ToastHandler.showError(
-        error?.response?.data?.message ||
-          "Error while signing up. Please try again later.",
-        loadingToast
-      );
+      toast({
+        variant: "destructive",
+        title:
+          error?.response?.data?.message ||
+          "Error while signing in. Please try again later.",
+      });
     }
   };
 

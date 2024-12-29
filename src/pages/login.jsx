@@ -3,16 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { AxiosPost } from "../utils/axiosCaller";
-import { toast } from "react-toastify";
-import ToastHandler from "../utils/ToastHandler";
 import { useCookies } from "react-cookie";
 import { constants } from "../utils/constants";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
+  // toast message hook
+  const { toast } = useToast();
+
+  // to set the token (user's information) in the cookies
   const [cookies, setCookie] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+
+  // to navigate to the home page after successful login
   const navigate = useNavigate();
-  const [formInputs, setFormInputs] = useState({});
-  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const [formInputs, setFormInputs] = useState({}); // to store the form inputs
+  const [passwordVisible, setPasswordVisible] = useState(false); // to toggle the password visibility
 
   const handleFormInputChange = (key, value) => {
     setFormInputs((prevInputs) => ({
@@ -28,7 +34,10 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const loadingToast = ToastHandler.showLoading("Logging in... Please wait.");
+    toast({
+      title: "Logging in... Please wait.",
+    });
+
     try {
       const body = {
         email: formInputs.email,
@@ -38,15 +47,19 @@ const Login = () => {
       const api = "api/auth/login";
       const { data } = await AxiosPost(api, body);
       setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.token);
+
       navigate("/home");
-      ToastHandler.showSuccess("User logged in successfully!", loadingToast);
+      toast({
+        title: "Logged in successfully!",
+      });
     } catch (error) {
       console.error("Error while logging up: ", error);
-      ToastHandler.showError(
-        error?.response?.data?.message ||
+      toast({
+        variant: "destructive",
+        title:
+          error?.response?.data?.message ||
           "Error while logging in. Please try again later.",
-        loadingToast
-      );
+      });
     }
   };
 

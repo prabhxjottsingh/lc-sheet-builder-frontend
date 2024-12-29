@@ -17,9 +17,10 @@ export const Home = () => {
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
 
-  //if any refresh is needed on
+  //if any refresh is needed on the sidebar
   const { refreshSheetSidebar, refreshSheetDetailBar } = useContext(AppContext);
 
+  // data to show to the user
   const [sheetsMetadata, setSheetsMetadata] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState(null);
 
@@ -51,7 +52,7 @@ export const Home = () => {
 
   useEffect(() => {
     fetchUsersSheetMetadata();
-  }, [refreshSheetSidebar, refreshSheetDetailBar]);
+  }, [refreshSheetSidebar]);
 
   useEffect(() => {
     const isTokenMissing = !cookies[constants.COOKIES_KEY.AUTH_TOKEN];

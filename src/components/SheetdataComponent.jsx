@@ -25,11 +25,12 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Checkbox } from "./ui/checkbox";
 
 const SheetdataComponent = ({ categories, sheetId }) => {
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
-  const { refreshSheetdataComponent, setRefreshSheetDetailBar } =
+  const { refreshSheetdataComponent, setRefreshSheetDetailBar, setRefreshSheetdataComponent } =
     useContext(AppContext);
   const [activeTab, setActiveTab] = useState(0);
   const [problems, setProblems] = useState([]);
@@ -75,6 +76,49 @@ const SheetdataComponent = ({ categories, sheetId }) => {
     }
   };
 
+  const handleCheckboxClick = async (index) => {
+    const loadingToast = ToastHandler.showLoading(
+      "Updating problem marked state... Please wait."
+    );
+    console.log("This is the sheetData: ", problems[index]);
+    console.log("Is Marked Done Val: ", !problems[index].isMarkedDone)
+    try {
+        const body = {
+            problemId: problems[index]._id,
+            isMarkedDone: problems[index]?.isMarkedDone ? !problems[index].isMarkedDone : true,
+          };
+          
+      const api = "api/problem/markProblem";
+      await AxiosPost(api, body, token);
+      setRefreshSheetDetailBar((prev) => !prev);
+      setRefreshSheetdataComponent(prev => !prev);
+      ToastHandler.showSuccess(
+        `Problem ${body.isMarkedDone ? "Markend" : "Unmarked"} successcully`,
+        loadingToast
+      );
+    } catch (error) {
+      console.error("Error while updating problem marked done state: ", error);
+      ToastHandler.showError(
+        error?.response?.data?.message ||
+          "Error while updating the problem state. Please try again later.",
+        loadingToast
+      );
+    }
+  };
+
+  const handleProblemLinkClick = (problemEndPoint) => {
+    console.log("Problem End point: ", problemEndPoint);
+    if (!problemEndPoint) {
+      console.error("Problem endpoint is not provided");
+      return;
+    }
+
+    const baseUrl = "https://leetcode.com/problems"; // Replace with the actual base URL if different
+    const fullUrl = `${baseUrl}/${problemEndPoint}`;
+
+    window.open(fullUrl, "_blank"); // Opens the link in a new tab
+  };
+
   const fetchProblemsData = async () => {
     setIsLoading(true);
     const loadingToast = ToastHandler.showLoading(
@@ -92,10 +136,9 @@ const SheetdataComponent = ({ categories, sheetId }) => {
             (problemData) =>
               addedProblem.lcproblemId == problemData.stat.question_id
           );
-          return { ...matchingProblem, _id: addedProblem._id };
+          return { ...matchingProblem, ...addedProblem };
         })
       );
-
       ToastHandler.showSuccess("Problems fetched successfully", loadingToast);
     } catch (error) {
       console.error("Error while fetching problems data: ", error);
@@ -118,6 +161,10 @@ const SheetdataComponent = ({ categories, sheetId }) => {
   useEffect(() => {
     fetchProblemsData();
   }, [activeTab, refreshSheetdataComponent]);
+
+  useEffect(() => {
+    console.log("These are the problems: ", problems);
+  }, [problems]);
 
   return (
     <div className="flex-1  p-6 overflow-y-auto">
@@ -205,39 +252,59 @@ const SheetdataComponent = ({ categories, sheetId }) => {
           {categories && categories.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {problems.length > 0 ? (
-                problems.map((problem) => (
+                problems.map((problem, index) => (
                   <div
-                    key={problem?.stat?.question_id}
-                    className="border  shadow-md p-6 rounded-lg hover:bg-gray-950 cursor-pointer duration-300"
+                    key={problem?._id}
+                    className="border border-gray-800 shadow-lg p-6 rounded-lg hover:bg-gray-950 hover:shadow-xl cursor-pointer transition-all duration-300 ease-in-out"
                   >
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-bold text-white text-lg">
-                        {problem?.stat?.question__title || "Untitled Problem"}
+                      <h3 className="font-semibold text-white text-lg cursor-pointer ">
+                        <div className="flex items-center space-x-2">
+                          <div onClick={() => handleCheckboxClick(index)}>
+                            <Checkbox
+                              checked={problem?.isMarkedDone || false}
+                              // onCheckedChange={handleCheckboxClick(index)}
+                            />
+                          </div>
+                          <label
+                            htmlFor={`problem-checkbox-${problem?.stat?.question_id}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 hover:underline hover:text-blue-500"
+                            onClick={() =>
+                              handleProblemLinkClick(
+                                problem?.stat?.question__title_slug
+                              )
+                            }
+                          >
+                            {problem?.stat?.question__title ||
+                              "Untitled Problem"}
+                          </label>
+                        </div>
                       </h3>
-                      <span
+
+                      {/* <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           difficultyColors[problem?.difficulty?.level]
                         }`}
                       >
                         {difficultyLabels[problem?.difficulty?.level] ||
                           "Unknown"}
-                      </span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
+                      </span> */}
+                      <DropdownMenu className=" border-gray-950">
+                        <DropdownMenuTrigger className=" border-gray-950">
                           <Tooltip>
                             <TooltipTrigger>
                               <Button
                                 variant="outline"
                                 className="duration-200 border-none"
                               >
-                                <MoreVertical className="" />
+                                <MoreVertical />
                               </Button>
                               <TooltipContent>{"Sheet Actions"}</TooltipContent>
                             </TooltipTrigger>
                           </Tooltip>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 rounded-lg shadow-md ring-1  focus:outline-none transition-all duration-200">
-                          <DropdownMenuLabel className=" font-semibold text-slate-100 p-2">
+                        <DropdownMenuContent className="w-56 rounded-lg shadow-md ring-1 focus:outline-none transition-all duration-200">
+                          <DropdownMenuLabel className="font-semibold text-slate-100 p-2">
                             Problem Edit Options
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />

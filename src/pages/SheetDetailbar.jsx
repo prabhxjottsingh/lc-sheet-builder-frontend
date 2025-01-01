@@ -1,16 +1,9 @@
 import {
   BookOpen,
   ChartColumn,
-  ChevronDown,
-  Dot,
   LucideTrash,
-  MoreHorizontal,
   MoreVertical,
-  Pencil,
   Plus,
-  Star,
-  Trash,
-  Trash2Icon,
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import ToastHandler from "@/utils/ToastHandler";
@@ -18,7 +11,7 @@ import { AxiosDelete, AxiosGet, AxiosPost } from "@/utils/axiosCaller";
 import { useCookies } from "react-cookie";
 import { constants } from "@/utils/constants";
 import { AppContext } from "@/lib/Appcontext";
-import SheetdataComponent from "@/components/SheetdataComponent";
+import SheetProblemsDataComponent from "@/components/SheetProblemsDataComponent";
 import AddNewCategoryModal from "@/components/Modals/AddNewCategoryModal";
 import ConfirmationModal from "@/components/Modals/ConfrimationModal";
 import {
@@ -38,16 +31,21 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useParams } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
-export const SheetDetailbar = ({ selectedSheet }) => {
-  const { refreshSheetDetailBar, setRefreshSheetDetailBar } =
-    useContext(AppContext);
+export const SheetDetailbar = () => {
+  const { sheetId } = useParams();
+  const [currentSheet, setCurrentSheet] = useState(null);
   const [categories, setCategories] = useState([]);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [sheetDetails, setSheetDetails] = useState({});
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
+  const { refreshSheetDetailBar, setRefreshSheetDetailBar } =
+    useContext(AppContext);
+
   const handleAddCategoryClick = () => {
     setIsAddCategoryModalOpen(true);
   };
@@ -58,68 +56,86 @@ export const SheetDetailbar = ({ selectedSheet }) => {
   };
 
   const handleConfirmDelete = async () => {
-    const loadingToast = ToastHandler.showLoading("Deleting... Please wait.");
+    toast({
+      title: "Deleting... Please wait.",
+    });
     try {
-      const queryParams = { sheetId: selectedSheet._id };
+      const queryParams = { sheetId: sheetId };
       const api = "api/sheet/deletesheet";
       await AxiosDelete(api, queryParams, token);
       setRefreshSheetDetailBar((prev) => !prev);
       closeModal();
-      ToastHandler.showSuccess(
-        "Sheet fetched successfully successfully!",
-        loadingToast
-      );
+      toast({
+        title: "Sheet deleted successfully!",
+      });
     } catch (error) {
       console.error("Error while deleting sheet: ", error);
+      toast({
+        variant: "destructive",
+        title:
+          error?.response?.data?.message ||
+          "Error while deleting sheet. Please try again later.",
+      });
+    }
+  };
+
+  const fetchSheetData = async () => {
+    try {
+      const queryParams = { sheetId: sheetId };
+      const api = "api/sheet/getsheetdetails";
+      const response = await AxiosGet(api, queryParams, token);
+      const sheetData = response.data.data;
+      setCurrentSheet(sheetData);
+      setSheetDetails({
+        sheetName: sheetData?.metadata?.name || "Sheet Name is Not Defined",
+        sheetDescription:
+          sheetData?.metadata?.description ||
+          "Sheet Description is Not Defined",
+        categories: [],
+      });
+    } catch (error) {
+      console.error("Error while fetching sheet data: ", error);
       ToastHandler.showError(
         error?.response?.data?.message ||
-          "Error while deleting sheet. Please try again later.",
-        loadingToast
+          "Error while fetching sheet data. Please try again later."
       );
     }
   };
 
-  const fetchCategoryBySheetMetaData = async () => {
-    const loadingToast = ToastHandler.showLoading(
-      "Fetching category data... Please wait."
-    );
+  const fetchCategories = async () => {
     try {
-      const queryParams = { sheetId: selectedSheet._id };
+      const queryParams = { sheetId: sheetId };
       const api = "api/category/getcategoriesbysheetid";
       const response = await AxiosGet(api, queryParams, token);
 
-      const categoryIdsMetadata = response.data.data.map(
-        (categoryMetadata) => ({
-          ...categoryMetadata.metadata,
-          _id: categoryMetadata._id,
-        })
-      );
-      setCategories(categoryIdsMetadata);
-      ToastHandler.showSuccess(
-        "Category data fetched successfully successfully!",
-        loadingToast
-      );
-
+      const categoryMetadata = response.data.data.map(({ metadata, _id }) => ({
+        ...metadata,
+        _id,
+      }));
+      setCategories(categoryMetadata);
       setSheetDetails((prev) => ({
-        sheetName: selectedSheet?.metadata?.name || "Sheet Name is Not Defined",
-        sheetDescription:
-          selectedSheet?.metadata?.description ||
-          "Sheet Description is Not Defined",
-        categories: categoryIdsMetadata || [],
+        ...prev,
+        categories: categoryMetadata,
       }));
     } catch (error) {
       console.error("Error while fetching Category metadata: ", error);
-      ToastHandler.showError(
-        error?.response?.data?.message ||
+      toast({
+        variant: "destructive",
+        title:
+          error?.response?.data?.message ||
           "Error while fetching Category data. Please try again later.",
-        loadingToast
-      );
+      });
     }
   };
 
   useEffect(() => {
-    fetchCategoryBySheetMetaData();
-  }, [selectedSheet, refreshSheetDetailBar]);
+    if (!sheetId) return;
+    const fetchData = async () => {
+      await fetchSheetData();
+      fetchCategories();
+    };
+    fetchData();
+  }, [sheetId, refreshSheetDetailBar]);
 
   // Calculate the progress percentage
   //   useEffect(() => {
@@ -131,10 +147,10 @@ export const SheetDetailbar = ({ selectedSheet }) => {
   //   }, [sheetDetails]);
 
   return (
-    <>
-      {" "}
-      <div className="w-64 p-4">
-        <div className="p-4">
+    <div className="flex h-screen">
+      {/* Sheet Detailbar Section */}
+      <div className="p-4">
+        <div className="w-64 p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">
             Sheet Information
           </h4>
@@ -221,6 +237,7 @@ export const SheetDetailbar = ({ selectedSheet }) => {
                 sheetDetails.categories.length > 0 ? (
                   sheetDetails.categories.map((category, index) => (
                     <Badge
+                      key={index}
                       className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition duration-200 ease-in-out ${category.color} text-white`}
                     >
                       {category.name}
@@ -236,14 +253,15 @@ export const SheetDetailbar = ({ selectedSheet }) => {
           </div>
         </div>
       </div>
+
       {/* Add New Category Modal */}
       <AddNewCategoryModal
         isOpen={isAddCategoryModalOpen}
-        sheetId={selectedSheet._id}
+        sheetId={sheetId}
         onClose={closeModal}
       />
-      {/* Main Content Area */}
-      <SheetdataComponent categories={categories} sheetId={selectedSheet._id} />
+
+      <SheetProblemsDataComponent categories={categories} sheetId={sheetId} />
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={isConfirmationModalOpen}
@@ -252,6 +270,6 @@ export const SheetDetailbar = ({ selectedSheet }) => {
         onCancel={() => setIsConfirmationModalOpen(false)}
         message="Are you sure you want to delete this sheet? This action cannot be undone."
       />
-    </>
+    </div>
   );
 };

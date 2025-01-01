@@ -5,8 +5,10 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [refreshSheetDetailBar, setRefreshSheetDetailBar] = useState(false);
   const [refreshSheetSidebar, setRefreshSheetSidebar] = useState(false);
-  const [refreshSheetdataComponent, setRefreshSheetdataComponent] =
-    useState(false);
+  const [
+    refreshSheetProblemsDataComponent,
+    setRefreshSheetProblemsDataComponent,
+  ] = useState(false);
 
   const value = {
     refreshSheetDetailBar,
@@ -15,8 +17,8 @@ export const AppProvider = ({ children }) => {
     refreshSheetSidebar,
     setRefreshSheetSidebar,
 
-    refreshSheetdataComponent,
-    setRefreshSheetdataComponent,
+    refreshSheetProblemsDataComponent,
+    setRefreshSheetProblemsDataComponent,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -5,38 +5,32 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "./pages/login";
-import Signup from "./pages/signup";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import { Home } from "./pages/Home";
-import { AppProvider } from "./lib/Appcontext";
-import { SidebarProvider } from "./components/ui/sidebar";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { Tooltip } from "./components/ui/tooltip";
-import DefaultLayout from "./pages/DefaultLayout";
-// import SizeBar from "./components/ui/sizebar"; // Import the SizeBar component
+import { SheetDetailbar } from "./pages/SheetDetailbar";
+import DefaultLayout from "./components/DefaultLayout";
 
-// DefaultLayout Component
+const AppRouter = () => {
+  return (
+    <Router>
+      <Routes>
+        {/* Auth Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<Navigate to="/login" />} />
 
+        {/* Routes with Shared Layout */}
+        <Route element={<DefaultLayout />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/sheet/:sheetId" element={<SheetDetailbar />} />
+        </Route>
 
-const AppRouter = () => (
-  <Router>
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Login />} />
-      <Route path="*" element={<Navigate to="/" />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route
-        path="/home"
-        element={
-          <AppProvider>
-            <TooltipProvider>
-                <Home />
-            </TooltipProvider>
-          </AppProvider>
-        }
-      />
-    </Routes>
-  </Router>
-);
+        {/* Catch-All for Invalid Routes */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
+  );
+};
 
 export default AppRouter;

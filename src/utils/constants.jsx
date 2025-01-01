@@ -9,25 +9,23 @@ export const badgeColors = {
   Yellow: "bg-yellow-600",
   Red: "bg-red-600",
   White: "bg-pink-500",
-  Purple: "bg-purple-600", 
+  Purple: "bg-purple-600",
 };
 
 export const difficultyColors = {
-  0: "bg-green-600 text-white", 
-  1: "bg-green-300 text-black", 
-  2: "bg-yellow-600 text-white", 
-  3: "bg-red-600 text-white", 
+  1: "bg-green-600 text-white", // Easy - A softer green for better accessibility
+  2: "bg-yellow-600 text-white", // Medium - A vibrant orange to stand out
+  3: "bg-red-700 text-white", // Hard - A deeper red to emphasize difficulty
 };
 
 export const difficultyLabels = {
-  0: "Easy",
-  1: "Medium",
-  2: "Hard",
-  3: "Insane",
+  1: "Easy",
+  2: "Medium",
+  3: "Hard",
 };
 
 export const API_ENDPOINTS = {
-    SHEET: {
-        GET_SHEET_METADATA: ""
-    }
-}
+  SHEET: {
+    GET_SHEET_METADATA: "",
+  },
+};

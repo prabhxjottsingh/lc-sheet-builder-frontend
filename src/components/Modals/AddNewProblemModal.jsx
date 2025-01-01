@@ -15,6 +15,7 @@ import {
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { toast } from "@/hooks/use-toast";
 
 Modal.setAppElement("#root");
 
@@ -31,7 +32,7 @@ const DIFFICULTY_LABELS = {
 };
 
 const AddNewProblemModal = ({ isOpen, onClose, categoryId }) => {
-  const { setRefreshSheetdataComponent } = useContext(AppContext);
+  const { setRefreshSheetProblemsDataComponent } = useContext(AppContext);
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
 
@@ -64,10 +65,10 @@ const AddNewProblemModal = ({ isOpen, onClose, categoryId }) => {
       ToastHandler.showError("Please select at least one problem");
       return;
     }
-
-    const loadingToast = ToastHandler.showLoading(
-      "Adding problems... Please wait."
-    );
+    toast({
+      variant: "info",
+      title: "Adding problems... Please wait.",
+    });
 
     try {
       const body = {
@@ -80,25 +81,32 @@ const AddNewProblemModal = ({ isOpen, onClose, categoryId }) => {
       const api = "api/problem/addnewproblems";
       await AxiosPost(api, body, token);
 
-      setRefreshSheetdataComponent((prev) => !prev);
-      onClose();
-      ToastHandler.showSuccess(
-        `${selectedProblems.length} problem(s) added successfully!`,
-        loadingToast
-      );
+      setRefreshSheetProblemsDataComponent((prev) => !prev);
+      closeModal();
+      toast({
+        title: "Problems added successfully!",
+      });
     } catch (error) {
       console.error("Error while adding problems: ", error);
-      ToastHandler.showError(
-        error?.response?.data?.message ||
+      toast({
+        variant: "destructive",
+        title:
+          error?.response?.data?.message ||
           "Error while adding problems. Please try again later.",
-        loadingToast
-      );
+      });
     }
+  };
+
+  const closeModal = () => {
+    onClose();
+    setSelectedProblems([]);
+    setSearchTerm("");
+    setDifficultyFilter(null);
   };
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen} onOpenChange={closeModal}>
         <DialogContent className="sm:max-w-[900px] fixed  overflow-hidden ">
           <DialogHeader>
             <DialogTitle>Add Problem</DialogTitle>
@@ -207,7 +215,7 @@ const AddNewProblemModal = ({ isOpen, onClose, categoryId }) => {
             <div className="flex space-x-4">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={closeModal}
                 className="bg-gray-600 text-gray-200 py-2 px-4 rounded-md hover:bg-gray-500"
               >
                 Cancel

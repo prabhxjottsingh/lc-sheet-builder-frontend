@@ -271,7 +271,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
                           key={problem._id}
                           className=" transition-colors duration-200"
                         >
-                          <TableCell className="px-4 py-3 border-b w-4 px-4 py-2 border-b font-semibold text-lg text-left">
+                          <TableCell className=" w-4 px-4 py-2 border-b font-semibold text-lg text-left">
                             <DropdownMenu className=" border-gray-950">
                               <DropdownMenuTrigger className=" border-gray-950">
                                 <Tooltip>
@@ -308,7 +308,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
-                          <TableCell className="px-4 py-3 border-b w-4 px-4 py-2 border-b font-semibold text-lg text-left">
+                          <TableCell className="w-4 px-4 py-2 border-b font-semibold text-lg text-left">
                             <Checkbox
                               checked={problem.isMarkedDone}
                               onClick={() => handleCheckboxClick(idx)}

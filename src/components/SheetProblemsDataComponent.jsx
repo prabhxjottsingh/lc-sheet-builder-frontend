@@ -77,7 +77,11 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
       };
       const api = "api/problem/deleteproblem";
       await AxiosDelete(api, queryParams, token);
-      setRefreshSheetDetailBar((prev) => !prev);
+      setProblems((prevProblems) => {
+        return prevProblems.filter(
+          (problem) => problem._id !== selectedProblem._id
+        );
+      });
       closeModal();
       toast({
         title: "Deleted successfully!",
@@ -200,7 +204,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
 
       <Card className="w-full">
         <CardHeader className={"mt-10"}>
-          <CardTitle className="text-xl font-bold flex items-center justify-between gap-4">
+          <CardTitle className="text-xl font-bold flex items-center justify-between gap-4 mb-4">
             <span>Problems List</span>
             <Button
               className="flex items-center justify-between border-collapse px-4 py-2 bg-blue-800 rounded-lg text-white hover:bg-gray-700 shadow-md transition-transform transform hover:scale-105"
@@ -213,12 +217,18 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
             </Button>
           </CardTitle>
 
-          <CardContent className="overflow-x-auto w-full">
+          <CardContent
+            className="overflow-y-auto max-h-[calc(100vh-285px)] overflow-x-hidden"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "#808080 #000000",
+            }}
+          >
             {isLoading ? (
               <Loader />
             ) : (
               <div>
-                <Table className="mt-10 border-collapse w-full text-sm">
+                <Table className="mt-10 border-collapse w-full text-sm scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-900">
                   <TableCaption className="text-gray-500 text-base"></TableCaption>
                   <TableHeader>
                     <TableRow>
@@ -241,6 +251,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
                       {/* <TableHead className="px-4 py-2 border-b font-semibold text-lg text-center">
                         Topics
                       </TableHead> */}
+
                       <TableHead className="px-4 py-2 border-b font-semibold text-lg text-center">
                         Acceptance
                       </TableHead>

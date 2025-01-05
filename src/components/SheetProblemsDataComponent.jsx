@@ -40,7 +40,11 @@ import { Button } from "./ui/button";
 import { LucideTrash, MoreVertical, Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-const SheetProblemsDataComponent = ({ categories, sheetId }) => {
+const SheetProblemsDataComponent = ({
+  categories,
+  sheetId,
+  isSheetEditable = false,
+}) => {
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
   const {
@@ -56,6 +60,29 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
   const [deletingResource, setDeleteResource] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const hanldeOpenAddProblemModal = () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to add problems to this sheet.",
+      });
+      return;
+    }
+    setIsAddProblemModalOpen(true);
+  };
+
+  const handleDeleteProblemModal = (problem) => () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to delete problems from this sheet.",
+      });
+      return;
+    }
+    setSelectedProblem(problem);
+    setIsConfirmationModalOpen(true);
+  };
 
   const closeModal = () => {
     setIsAddProblemModalOpen(false);
@@ -98,6 +125,13 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
   };
 
   const handleCheckboxClick = async (index) => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to update the problem state.",
+      });
+      return;
+    }
     toast({
       title: "Updating... Please wait.",
     });
@@ -137,7 +171,6 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
   };
 
   const handleProblemLinkClick = (problemEndPoint) => {
-    console.log("Problem End point: ", problemEndPoint);
     if (!problemEndPoint) {
       console.error("Problem endpoint is not provided");
       return;
@@ -180,7 +213,6 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
   };
 
   useEffect(() => {
-    console.log("Rerun");
     if (categories && categories.length > 0) {
       setActiveTab(0);
     } else {
@@ -200,6 +232,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
         selectedCategoryIndex={activeTab}
         onCategorySelect={handleCategoryTabClick}
         sheetId={sheetId}
+        isSheetEditable={isSheetEditable}
       />
 
       <Card className="w-full">
@@ -208,9 +241,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
             <span>Problems List</span>
             <Button
               className="flex items-center justify-between border-collapse px-4 py-2 bg-blue-800 rounded-lg text-white hover:bg-gray-700 shadow-md transition-transform transform hover:scale-105"
-              onClick={() => {
-                setIsAddProblemModalOpen(true);
-              }}
+              onClick={hanldeOpenAddProblemModal}
             >
               <span className="text-sm font-medium">Add Problem</span>
               <Plus className="w-5 h-5 ml-2" />
@@ -218,7 +249,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
           </CardTitle>
 
           <CardContent
-            className="overflow-y-auto max-h-[calc(100vh-285px)] overflow-x-hidden"
+            className="overflow-y-auto max-h-[calc(100vh-265px)] overflow-x-hidden"
             style={{
               scrollbarWidth: "thin",
               scrollbarColor: "#808080 #000000",
@@ -295,10 +326,7 @@ const SheetProblemsDataComponent = ({ categories, sheetId }) => {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   className="flex items-center justify-between p-2 rounded-lg text-red-500 hover:text-red-600 transition-colors duration-200"
-                                  onClick={() => {
-                                    setIsConfirmationModalOpen(true);
-                                    setSelectedProblem(problem);
-                                  }}
+                                  onClick={handleDeleteProblemModal(problem)}
                                 >
                                   Delete
                                   <DropdownMenuShortcut>

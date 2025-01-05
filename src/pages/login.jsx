@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +6,7 @@ import { AxiosPost } from "../utils/axiosCaller";
 import { useCookies } from "react-cookie";
 import { constants } from "../utils/constants";
 import { useToast } from "@/hooks/use-toast";
+import { AppContext } from "@/lib/Appcontext";
 
 const Login = () => {
   // toast message hook
@@ -13,6 +14,8 @@ const Login = () => {
 
   // to set the token (user's information) in the cookies
   const [cookies, setCookie] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+
+  const { setCurrentUserId } = useContext(AppContext);
 
   // to navigate to the home page after successful login
   const navigate = useNavigate();
@@ -46,12 +49,15 @@ const Login = () => {
 
       const api = "api/auth/login";
       const { data } = await AxiosPost(api, body);
-      setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.token);
+      setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.data.token);
+      setCurrentUserId(data.data.userId);
 
-      navigate("/home");
-      toast({
-        title: "Logged in successfully!",
-      });
+      setTimeout(() => {
+        navigate("/home");
+        toast({
+          title: "Logged in successfully!",
+        });
+      }, 3000);
     } catch (error) {
       console.error("Error while logging up: ", error);
       toast({

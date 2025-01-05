@@ -18,6 +18,15 @@ export const difficultyColors = {
   3: "bg-red-700 text-white", // Hard - A deeper red to emphasize difficulty
 };
 
+export const badgeColorsHex = {
+  "bg-green-600": "#16A34A", // Green
+  "bg-yellow-600": "#D97706", // Yellow
+  "bg-red-600": "#EF4444", // Red
+  "bg-pink-500": "#EC4899", // White (used as White in your mapping)
+  "bg-purple-600": "#8B5CF6", // Purple
+  "bg-gray-600": "#4B5563", // Gray
+};
+
 export const difficultyLabels = {
   1: "Easy",
   2: "Medium",

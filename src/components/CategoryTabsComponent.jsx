@@ -24,6 +24,7 @@ const CategoryTabsComponents = ({
   selectedCategoryIndex,
   onCategorySelect,
   sheetId,
+  isSheetEditable = false,
 }) => {
   const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
@@ -31,6 +32,28 @@ const CategoryTabsComponents = ({
 
   const [isAddProblemModalOpen, setIsAddProblemModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+
+  const handleOpenConfirmModal = () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to delete this category.",
+      });
+      return;
+    }
+    setIsConfirmationModalOpen(true);
+  };
+
+  const handleClickAddProblemModal = () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to add problems to this category.",
+      });
+      return;
+    }
+    setIsAddProblemModalOpen(true);
+  };
 
   const closeModal = () => {
     setIsAddProblemModalOpen(false);
@@ -99,9 +122,7 @@ const CategoryTabsComponents = ({
                   {/* Add new problem in the category option */}
                   <DropdownMenuItem
                     className="flex items-center justify-between p-2 rounded-lg transition-colors duration-200 text-gray-400"
-                    onClick={() => {
-                      setIsAddProblemModalOpen(true);
-                    }}
+                    onClick={handleClickAddProblemModal}
                   >
                     Add Problem
                     <DropdownMenuShortcut>
@@ -112,9 +133,7 @@ const CategoryTabsComponents = ({
                   {categoryIdx !== 0 && (
                     <DropdownMenuItem
                       className="flex items-center justify-between p-2 rounded-lg text-red-500 hover:text-red-600 transition-colors duration-200"
-                      onClick={() => {
-                        setIsConfirmationModalOpen(true);
-                      }}
+                      onClick={handleOpenConfirmModal}
                     >
                       Delete
                       <DropdownMenuShortcut>

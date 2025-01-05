@@ -9,6 +9,8 @@ export const AppProvider = ({ children }) => {
     refreshSheetProblemsDataComponent,
     setRefreshSheetProblemsDataComponent,
   ] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const value = {
     refreshSheetDetailBar,
@@ -19,6 +21,12 @@ export const AppProvider = ({ children }) => {
 
     refreshSheetProblemsDataComponent,
     setRefreshSheetProblemsDataComponent,
+
+    currentUserId,
+    setCurrentUserId,
+
+    isLoading,
+    setIsLoading,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

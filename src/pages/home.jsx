@@ -23,10 +23,12 @@ import { AppContext } from "@/lib/Appcontext";
 
 export const Home = () => {
   //users data
-  const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+  const [cookies] = useCookies([
+    constants.COOKIES_KEY.AUTH_TOKEN,
+    constants.COOKIES_KEY.USER_ID,
+  ]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
-
-  const { currentUserId } = useContext(AppContext);
+  const currentUserId = cookies[constants.COOKIES_KEY.USER_ID];
 
   const [pieChartsData, setPieChartsData] = useState([]);
 

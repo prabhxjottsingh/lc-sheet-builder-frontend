@@ -42,11 +42,14 @@ export const SheetDetailbar = () => {
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [sheetDetails, setSheetDetails] = useState({});
-  const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+  const [cookies] = useCookies([
+    constants.COOKIES_KEY.AUTH_TOKEN,
+    constants.COOKIES_KEY.USER_ID,
+  ]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
+  const currentUserId = cookies[constants.COOKIES_KEY.USER_ID];
   const { refreshSheetDetailBar, setRefreshSheetDetailBar } =
     useContext(AppContext);
-  const { currentUserId } = useContext(AppContext);
   const navigate = useNavigate();
   const [isSheetEditable, setIsSheetEditable] = useState(false);
 

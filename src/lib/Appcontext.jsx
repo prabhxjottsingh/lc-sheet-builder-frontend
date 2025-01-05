@@ -9,7 +9,6 @@ export const AppProvider = ({ children }) => {
     refreshSheetProblemsDataComponent,
     setRefreshSheetProblemsDataComponent,
   ] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const value = {
@@ -21,9 +20,6 @@ export const AppProvider = ({ children }) => {
 
     refreshSheetProblemsDataComponent,
     setRefreshSheetProblemsDataComponent,
-
-    currentUserId,
-    setCurrentUserId,
 
     isLoading,
     setIsLoading,

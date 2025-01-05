@@ -13,9 +13,10 @@ const Login = () => {
   const { toast } = useToast();
 
   // to set the token (user's information) in the cookies
-  const [cookies, setCookie] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
-
-  const { setCurrentUserId } = useContext(AppContext);
+  const [cookies, setCookie] = useCookies([
+    constants.COOKIES_KEY.AUTH_TOKEN,
+    constants.COOKIES_KEY.USER_ID,
+  ]);
 
   // to navigate to the home page after successful login
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const Login = () => {
       const api = "api/auth/login";
       const { data } = await AxiosPost(api, body);
       setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.data.token);
-      setCurrentUserId(data.data.userId);
+      setCookie(constants.COOKIES_KEY.USER_ID, data.data.userId);
 
       setTimeout(() => {
         navigate("/home");

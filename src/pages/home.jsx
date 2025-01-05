@@ -1,11 +1,185 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PieChart } from "@mui/x-charts";
+import PieChartWithCenterLabel from "@/components/ui/pie-chart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { AxiosGet } from "@/utils/axiosCaller";
+import { useCookies } from "react-cookie";
+import { badgeColorsHex, constants } from "@/utils/constants";
+import { toast } from "@/hooks/use-toast";
+import { AppContext } from "@/lib/Appcontext";
 
 export const Home = () => {
-  console.log("Home Page");
+  //users data
+  const [cookies] = useCookies([constants.COOKIES_KEY.AUTH_TOKEN]);
+  const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
+
+  const { currentUserId } = useContext(AppContext);
+
+  const [pieChartsData, setPieChartsData] = useState([]);
+
+  // Sample data array with mock content
+  const data = Array(6).fill({
+    title: "Striver 150",
+    description: "Monthly problem-solving statistics",
+    data: [
+      {
+        id: "Striver 150",
+        value: 750,
+        label: (location) =>
+          location === "tooltip" ? (
+            <>
+              <div>
+                Solved Problems:{" "}
+                <span className="font-bold text-green-600">34</span>
+              </div>
+              <div>
+                Unsolved Problems:{" "}
+                <span className="font-bold text-red-600">23</span>
+              </div>
+            </>
+          ) : (
+            ""
+          ),
+        color: "#4CAF50",
+        tooltip: "none",
+      },
+      {
+        id: "Neetcode 75",
+        value: 25,
+        tooltip: "none",
+        label: (location) =>
+          location === "tooltip" ? (
+            <>
+              <div>
+                Solved Problems:{" "}
+                <span className="font-bold text-green-600">34</span>
+              </div>
+              <div>
+                Unsolved Problems:{" "}
+                <span className="font-bold text-red-600">23</span>
+              </div>
+            </>
+          ) : (
+            ""
+          ),
+        color: "#FFA726",
+      },
+    ],
+    innerRadius: 85,
+  });
+
+  useEffect(() => {
+    const fetchAnalytcisData = async () => {
+      try {
+        const apiName = "api/user/useranalytics";
+        const response = await AxiosGet(
+          apiName,
+          { userId: currentUserId },
+          token
+        );
+        setPieChartsData(
+          response.data.data.map((item) => {
+            return {
+              title: item.title,
+              description: item.description,
+              data: item.data.map((dataItem) => {
+                return {
+                  id: dataItem.id,
+                  value: dataItem.value,
+                  label: (location) =>
+                    location === "tooltip" ? (
+                      <>
+                        <div className="text-lg font-semibold">
+                          <span className="text-gray-800">{dataItem.id}:</span>
+                        </div>
+                        <div className="space-y-2 mt-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-600">
+                              Solved Problems:
+                            </span>
+                            <span className="text-sm font-semibold text-green-600">
+                              {dataItem.label.solvedProblemsCount}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-600">
+                              Unsolved Problems:
+                            </span>
+                            <span className="text-sm font-semibold text-red-600">
+                              {dataItem.label.unsolvedProblemsCount}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      ""
+                    ),
+                  color: badgeColorsHex[dataItem?.color],
+                  tooltip: "none",
+                };
+              }),
+              innerRadius: item.innerRadius,
+            };
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching data", error);
+        toast({
+          variant: "destructive",
+          title:
+            error?.response?.data?.message ||
+            "Failed to fetch data. Please try again later",
+        });
+      }
+    };
+
+    fetchAnalytcisData();
+  }, []);
+
   return (
-    <>
-      <div> {"This home page is still in building stage"} </div>
-    </>
+    <div className="container mx-auto p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+        {pieChartsData.map((item, index) => (
+          <TooltipProvider key={index}>
+            <Card className="w-full md:w-[350px] lg:w-[400px] xl:w-[450px] hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">
+                  {item.title}
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  {item.description}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <div className="grid w-full items-center gap-4">
+                  <div className="relative">
+                    <PieChartWithCenterLabel
+                      data={item.data}
+                      innerRadius={item.innerRadius}
+                      centreLabel="Solved Problems"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TooltipProvider>
+        ))}
+      </div>
+    </div>
   );
 };
 

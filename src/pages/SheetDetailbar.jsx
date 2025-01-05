@@ -1,6 +1,7 @@
 import {
   BookOpen,
   ChartColumn,
+  Check,
   LucideTrash,
   MoreVertical,
   Plus,
@@ -31,7 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
 export const SheetDetailbar = () => {
@@ -45,9 +46,30 @@ export const SheetDetailbar = () => {
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
   const { refreshSheetDetailBar, setRefreshSheetDetailBar } =
     useContext(AppContext);
+  const { currentUserId } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [isSheetEditable, setIsSheetEditable] = useState(false);
 
   const handleAddCategoryClick = () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to add a category to this sheet.",
+      });
+      return;
+    }
     setIsAddCategoryModalOpen(true);
+  };
+
+  const handleOpenConfirmModal = () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to delete this sheet.",
+      });
+      return;
+    }
+    setIsConfirmationModalOpen(true);
   };
 
   const closeModal = () => {
@@ -93,12 +115,17 @@ export const SheetDetailbar = () => {
           "Sheet Description is Not Defined",
         categories: [],
       });
+      setIsSheetEditable(
+        sheetData?.createdBy.toString() === currentUserId || false
+      );
     } catch (error) {
       console.error("Error while fetching sheet data: ", error);
-      ToastHandler.showError(
-        error?.response?.data?.message ||
-          "Error while fetching sheet data. Please try again later."
-      );
+      navigate("/notauthorised");
+      toast({
+        title:
+          error?.response?.data?.message ||
+          "Error while fetching sheet data. Please try again later.",
+      });
     }
   };
 
@@ -119,11 +146,51 @@ export const SheetDetailbar = () => {
       }));
     } catch (error) {
       console.error("Error while fetching Category metadata: ", error);
+
       toast({
         variant: "destructive",
         title:
           error?.response?.data?.message ||
           "Error while fetching Category data. Please try again later.",
+      });
+    }
+  };
+
+  const makeSheetPublic = async () => {
+    if (!isSheetEditable) {
+      toast({
+        variant: "destructive",
+        title: "You are not authorized to make this sheet public.",
+      });
+      return;
+    }
+    toast({
+      title: "Making the sheet public... Please wait.",
+    });
+    try {
+      const newPublicStatus = !(currentSheet?.metadata?.isPublic ?? false);
+      const body = { sheetId: sheetId, isPublic: newPublicStatus };
+      const api = "api/sheet/makesheetpublic";
+      await AxiosPost(api, body, token);
+      setCurrentSheet((prev) => ({
+        ...prev,
+        metadata: {
+          ...(prev?.metadata || {}),
+          isPublic: newPublicStatus,
+        },
+      }));
+      toast({
+        title: newPublicStatus
+          ? "Sheet is now public!"
+          : "Sheet is now private!",
+      });
+    } catch (error) {
+      console.error("Error while making the sheet public: ", error);
+      toast({
+        variant: "destructive",
+        title:
+          error?.response?.data?.message ||
+          "Error while making the sheet public. Please try again later.",
       });
     }
   };
@@ -176,8 +243,25 @@ export const SheetDetailbar = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
+                  className={`flex items-center justify-between p-2 rounded-lg transition-colors duration-200 ${
+                    currentSheet?.metadata?.isPublic
+                      ? "bg-gray-600"
+                      : "hover:bg-gray-200"
+                  }`}
+                  onClick={() => makeSheetPublic()}
+                >
+                  Sheet Public
+                  <DropdownMenuShortcut>
+                    {currentSheet?.metadata?.isPublic ? (
+                      <Check className="w-5 h-5 ml-2" />
+                    ) : (
+                      ""
+                    )}
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   className="flex items-center justify-between p-2 rounded-lg text-red-500 hover:text-red-600 transition-colors duration-200"
-                  onClick={() => setIsConfirmationModalOpen(true)}
+                  onClick={handleOpenConfirmModal}
                 >
                   Delete
                   <DropdownMenuShortcut>
@@ -261,7 +345,11 @@ export const SheetDetailbar = () => {
         onClose={closeModal}
       />
 
-      <SheetProblemsDataComponent categories={categories} sheetId={sheetId} />
+      <SheetProblemsDataComponent
+        categories={categories}
+        sheetId={sheetId}
+        isSheetEditable={isSheetEditable}
+      />
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={isConfirmationModalOpen}

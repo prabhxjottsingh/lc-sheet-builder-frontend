@@ -19,11 +19,17 @@ const AppRouter = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Navigate to="/login" />} />
+        <Route
+          path="/notauthorised"
+          element={<div>You are not Authorised to view the data</div>}
+        />
 
         {/* Routes with Shared Layout */}
         <Route element={<DefaultLayout />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/sheet/:sheetId" element={<SheetDetailbar />} />
+          <>
+            <Route path="/home" element={<Home />} />
+            <Route path="/sheet/:sheetId" element={<SheetDetailbar />} />
+          </>
         </Route>
 
         {/* Catch-All for Invalid Routes */}

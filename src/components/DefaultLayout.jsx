@@ -1,31 +1,36 @@
-import { AppProvider } from "@/lib/Appcontext";
-import React from "react";
-import { TooltipProvider } from "./ui/tooltip";
-import DynamicSidebar from "./DynamicSidebar";
+import { AppContext, AppProvider } from "@/lib/Appcontext";
+import { AxiosGet } from "@/utils/axiosCaller";
+import { constants } from "@/utils/constants";
+import { useContext, useEffect } from "react";
+import { useCookies } from "react-cookie";
 import { Outlet, useLocation } from "react-router-dom";
+import { TooltipProvider } from "./ui/tooltip";
+import Navbar from "./Navbar";
+import DynamicSidebar from "./DynamicSidebar";
+import { toast } from "@/hooks/use-toast";
 
 const DefaultLayout = ({ children }) => {
-  const location = useLocation();
-
   return (
-    <AppProvider>
-      <TooltipProvider>
-        <div className="layout-container flex h-screen">
-          {/* Dynamic Sidebar */}
-          <div className="sidebar-container">
+    <TooltipProvider>
+      <div className="min-h-screen flex flex-col">
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Main Content */}
+        <div className="flex flex-1 -mt-4">
+          {/* Sidebar */}
+          <aside>
             <DynamicSidebar />
-          </div>
-          {/* Content Container */}
-          <div className="flex-grow content-container flex flex-col">
-            {/* Ensuring children have unique key based on pathname to avoid rerendering issues */}
-            <div key={location.pathname} className="w-full">
-              {children}
-            </div>
+          </aside>
+
+          {/* Main Content Area */}
+          <main className="flex-grow content-container flex flex-col">
+            <div key={location.pathname}>{children}</div>
             <Outlet />
-          </div>
+          </main>
         </div>
-      </TooltipProvider>
-    </AppProvider>
+      </div>
+    </TooltipProvider>
   );
 };
 

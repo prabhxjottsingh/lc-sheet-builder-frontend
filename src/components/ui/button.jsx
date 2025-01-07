@@ -38,12 +38,11 @@ const Button = React.forwardRef(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
 
-    // Ensure "Comp" is not nested within another button
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        role={asChild ? undefined : "button"} // Add a fallback role for non-button elements
+        role={asChild ? undefined : "button"}
         {...props}
       />
     );

@@ -207,15 +207,6 @@ export const SheetDetailbar = () => {
     fetchData();
   }, [sheetId, refreshSheetDetailBar]);
 
-  // Calculate the progress percentage
-  //   useEffect(() => {
-  //     setProgressPercentage(() => {
-  //       return sheetDetails.totalProblems > 0
-  //         ? (sheetDetails.solvedProblems / sheetDetails.totalProblems) * 100
-  //         : 0;
-  //     });
-  //   }, [sheetDetails]);
-
   return (
     <div className="flex h-screen">
       {/* Sheet Detailbar Section */}

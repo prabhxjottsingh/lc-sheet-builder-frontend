@@ -176,10 +176,10 @@ const SheetProblemsDataComponent = ({
       return;
     }
 
-    const baseUrl = "https://leetcode.com/problems"; // Replace with the actual base URL if different
+    const baseUrl = "https://leetcode.com/problems";
     const fullUrl = `${baseUrl}/${problemEndPoint}`;
 
-    window.open(fullUrl, "_blank"); // Opens the link in a new tab
+    window.open(fullUrl, "_blank");
   };
 
   const fetchProblemsData = async () => {

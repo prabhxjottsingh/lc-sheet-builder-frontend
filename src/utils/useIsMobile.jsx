@@ -6,10 +6,10 @@ export const useIsMobile = () => {
 
   useEffect(() => {
     const updateMobileStatus = () => {
-      setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    updateMobileStatus(); // Check on mount
+    updateMobileStatus();
     window.addEventListener("resize", updateMobileStatus);
 
     return () => {

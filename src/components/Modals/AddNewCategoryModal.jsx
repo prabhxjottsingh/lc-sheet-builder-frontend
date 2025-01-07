@@ -107,7 +107,7 @@ const AddNewCategoryModal = ({ isOpen, sheetId, onClose }) => {
                         ? "ring-4 ring-blue-200  ring-offset-2 ring-offset-gray-800 scale-110 shadow-lg"
                         : "ring-2 ring-gray-600 ring-offset-2 ring-offset-gray-800 hover:scale-105 hover:shadow-md"
                     }`}
-                    title={key} // Display the color name on hover
+                    title={key}
                   >
                     <Avatar>
                       <AvatarFallback

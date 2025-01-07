@@ -1,25 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PieChart } from "@mui/x-charts";
 import PieChartWithCenterLabel from "@/components/ui/pie-chart";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { AxiosGet } from "@/utils/axiosCaller";
 import { useCookies } from "react-cookie";
 import { badgeColorsHex, constants } from "@/utils/constants";
 import { toast } from "@/hooks/use-toast";
-import { AppContext } from "@/lib/Appcontext";
 
 export const Home = () => {
   //users data
@@ -31,57 +23,6 @@ export const Home = () => {
   const currentUserId = cookies[constants.COOKIES_KEY.USER_ID];
 
   const [pieChartsData, setPieChartsData] = useState([]);
-
-  // Sample data array with mock content
-  const data = Array(6).fill({
-    title: "Striver 150",
-    description: "Monthly problem-solving statistics",
-    data: [
-      {
-        id: "Striver 150",
-        value: 750,
-        label: (location) =>
-          location === "tooltip" ? (
-            <>
-              <div>
-                Solved Problems:{" "}
-                <span className="font-bold text-green-600">34</span>
-              </div>
-              <div>
-                Unsolved Problems:{" "}
-                <span className="font-bold text-red-600">23</span>
-              </div>
-            </>
-          ) : (
-            ""
-          ),
-        color: "#4CAF50",
-        tooltip: "none",
-      },
-      {
-        id: "Neetcode 75",
-        value: 25,
-        tooltip: "none",
-        label: (location) =>
-          location === "tooltip" ? (
-            <>
-              <div>
-                Solved Problems:{" "}
-                <span className="font-bold text-green-600">34</span>
-              </div>
-              <div>
-                Unsolved Problems:{" "}
-                <span className="font-bold text-red-600">23</span>
-              </div>
-            </>
-          ) : (
-            ""
-          ),
-        color: "#FFA726",
-      },
-    ],
-    innerRadius: 85,
-  });
 
   useEffect(() => {
     const fetchAnalytcisData = async () => {

@@ -54,14 +54,13 @@ export const jsonToQueryParamStringConvertor = (queryParams) => {
   const queryString = Object.keys(queryParams)
     .map((key) => {
       const value = queryParams[key];
-      // Handle null or undefined values
+
       if (value == null) return "";
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     })
-    .filter((param) => param !== "") // Remove empty keys (if any)
+    .filter((param) => param !== "")
     .join("&");
 
-  // Add '?' only if there are query parameters
   return queryString ? `?${queryString}` : "";
 };
 

@@ -14,18 +14,18 @@ export const badgeColors = {
 };
 
 export const difficultyColors = {
-  1: "bg-green-600 text-white", // Easy - A softer green for better accessibility
-  2: "bg-yellow-600 text-white", // Medium - A vibrant orange to stand out
-  3: "bg-red-700 text-white", // Hard - A deeper red to emphasize difficulty
+  1: "bg-green-600 text-white",
+  2: "bg-yellow-600 text-white",
+  3: "bg-red-700 text-white",
 };
 
 export const badgeColorsHex = {
-  "bg-green-600": "#16A34A", // Green
-  "bg-yellow-600": "#D97706", // Yellow
-  "bg-red-600": "#EF4444", // Red
-  "bg-pink-500": "#EC4899", // White (used as White in your mapping)
-  "bg-purple-600": "#8B5CF6", // Purple
-  "bg-gray-600": "#4B5563", // Gray
+  "bg-green-600": "#16A34A",
+  "bg-yellow-600": "#D97706",
+  "bg-red-600": "#EF4444",
+  "bg-pink-500": "#EC4899",
+  "bg-purple-600": "#8B5CF6",
+  "bg-gray-600": "#4B5563",
 };
 
 export const difficultyLabels = {

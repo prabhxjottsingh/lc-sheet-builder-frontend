@@ -48,7 +48,7 @@ const Signup = () => {
       const api = "api/auth/signup";
       const { data } = await AxiosPost(api, body);
       setCookie(constants.COOKIES_KEY.AUTH_TOKEN, data.token);
-
+      setCookie(constants.COOKIES_KEY.USER_ID, data.userId);
       navigate("/home");
       toast({
         title: "User signed up successfully!",

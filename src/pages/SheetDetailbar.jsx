@@ -48,7 +48,7 @@ export const SheetDetailbar = () => {
   ]);
   const token = cookies[constants.COOKIES_KEY.AUTH_TOKEN];
   const currentUserId = cookies[constants.COOKIES_KEY.USER_ID];
-  const { refreshSheetDetailBar, setRefreshSheetDetailBar } =
+  const { refreshSheetDetailBar, setRefreshSheetSidebar } =
     useContext(AppContext);
   const navigate = useNavigate();
   const [isSheetEditable, setIsSheetEditable] = useState(false);
@@ -88,8 +88,9 @@ export const SheetDetailbar = () => {
       const queryParams = { sheetId: sheetId };
       const api = "api/sheet/deletesheet";
       await AxiosDelete(api, queryParams, token);
-      setRefreshSheetDetailBar((prev) => !prev);
       closeModal();
+      setRefreshSheetSidebar((prev) => !prev);
+      navigate("/home");
       toast({
         title: "Sheet deleted successfully!",
       });
